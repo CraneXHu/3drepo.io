@@ -19,7 +19,6 @@ import { bindActionCreators } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import { connect } from '../../../../helpers/migration';
 
-import { Groups } from './groups.component';
 import {
 	GroupsActions,
 	selectGroups,
@@ -36,6 +35,7 @@ import {
 } from './../../../../modules/groups';
 import { DialogActions } from '../../../../modules/dialog';
 import { selectSettings } from '../../../../modules/model';
+import { Groups } from './groups.component';
 
 const mapStateToProps = createStructuredSelector({
 	groups: selectGroups,

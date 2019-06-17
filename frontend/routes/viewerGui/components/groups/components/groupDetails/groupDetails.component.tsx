@@ -240,7 +240,6 @@ export class GroupDetails extends React.PureComponent<IProps, IState> {
 		return (
 			<Container>
 				<Content
-					className="height-catcher"
 					onScroll={this.handlePanelScroll}
 					innerRef={this.panelRef}
 				>
