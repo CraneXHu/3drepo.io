@@ -37,8 +37,6 @@ class HomeController implements ng.IController {
 		'DialogService'
 	];
 
-	private doNotLogout;
-	private legalPages;
 	private loggedOutStates;
 	private loggedIn;
 	private loginPage;
@@ -88,7 +86,6 @@ class HomeController implements ng.IController {
 
 		// Pages to not attempt a interval triggered logout from
 
-		this.legalPages = this.AuthService.legalPages;
 		this.loggedOutStates = this.AuthService.loggedOutStates;
 
 		this.loggedIn = false;

@@ -35,7 +35,6 @@ export class AuthService {
 
 	public initialAuthPromise;
 
-	private doNotLogout;
 	private loggedOutStates;
 	private username;
 	private loggedIn;
@@ -58,16 +57,6 @@ export class AuthService {
 		private ClientConfigService: any,
 		private AnalyticService: any
 	) {
-		this.doNotLogout = [
-			'/terms',
-			'/privacy',
-			'/signUp',
-			'/passwordForgot',
-			'/passwordChange',
-			'/registerRequest',
-			'/registerVerify'
-		];
-
 		this.loggedOutStates = [
 			'app.login',
 			'app.signUp',
