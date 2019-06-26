@@ -14,9 +14,10 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { subscribe } from '../../../helpers/migration';
+import { subscribe, getState } from '../../../helpers/migration';
 import { selectIsAuthenticated, selectIsPending } from '../../../modules/auth';
 import { STATIC_ROUTES } from '../../../services/staticPages';
+import { loggedOutStates } from '../../../modules/auth/auth.constants';
 
 class HomeController implements ng.IController {
 
@@ -37,7 +38,6 @@ class HomeController implements ng.IController {
 		'DialogService'
 	];
 
-	private loggedOutStates;
 	private loggedIn;
 	private loginPage;
 	private isLoggedOutPage;
@@ -86,8 +86,6 @@ class HomeController implements ng.IController {
 
 		// Pages to not attempt a interval triggered logout from
 
-		this.loggedOutStates = this.AuthService.loggedOutStates;
-
 		this.loggedIn = false;
 		this.loginPage = true;
 		this.isLoggedOutPage = false;
@@ -134,13 +132,13 @@ class HomeController implements ng.IController {
 		this.$scope.$watch('vm.state', (oldState, newState) => {
 			const change = JSON.stringify(oldState) !== JSON.stringify(newState);
 
-			this.loggedIn = this.AuthService.isLoggedIn();
+			this.loggedIn = selectIsAuthenticated(getState());
 
 			if ( (newState && change) || (newState && this.firstState)) {
 
 				// If it's a legal page
 				const legal = this.$state.current.name.includes('app.static');
-				const loggedOutPage = this.pageCheck(this.$state.current.name, this.loggedOutStates);
+				const loggedOutPage = this.pageCheck(this.$state.current.name, loggedOutStates);
 
 				if (legal) {
 					this.isLegalPage = true;
@@ -150,7 +148,6 @@ class HomeController implements ng.IController {
 					this.isLegalPage = false;
 					this.isLoggedOutPage = true;
 				} else if (
-					!this.AuthService.getUsername() &&
 					!legal &&
 					!loggedOutPage
 				) {

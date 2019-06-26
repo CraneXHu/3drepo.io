@@ -17,6 +17,7 @@
 import { getState } from '../../../helpers/migration';
 import { selectIsAuthenticated } from '../../../modules/auth';
 import { selectCurrentUser } from '../../../modules/currentUser';
+import { loggedOutStates } from '../../../modules/auth/auth.constants';
 
 export class AuthService {
 	public static $inject: string[] = [
@@ -35,7 +36,6 @@ export class AuthService {
 
 	public initialAuthPromise;
 
-	private loggedOutStates;
 	private username;
 	private loggedIn;
 	private state;
@@ -57,14 +57,6 @@ export class AuthService {
 		private ClientConfigService: any,
 		private AnalyticService: any
 	) {
-		this.loggedOutStates = [
-			'app.login',
-			'app.signUp',
-			'app.passwordForgot',
-			'app.registerRequest',
-			'app.registerVerify',
-			'app.passwordChange'
-		];
 
 		this.state = {};
 		this.events = {
@@ -90,7 +82,7 @@ export class AuthService {
 	public loggedOutPage() {
 		const state = this.$state.current.name;
 
-		return this.loggedOutStates.some((page) => {
+		return loggedOutStates.some((page) => {
 			return state.indexOf(page) !== -1;
 		});
 	}
