@@ -19,6 +19,9 @@ export class ClientConfigService {
 	public resourceUploadSizeLimit;
 	// tslint:disable-next-line
 	public login_check_interval;
+	public ga;
+	public userId;
+	public development;
 	// tslint:disable-next-line
 	public captcha_client_key;
 	public legalTemplates;
