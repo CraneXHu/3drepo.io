@@ -18,10 +18,12 @@
 import { all, put, select, takeLatest } from 'redux-saga/effects';
 import { differenceBy, isEmpty, omit, pick, map } from 'lodash';
 import * as filesize from 'filesize';
+import { push } from 'connected-react-router';
+
 import * as API from '../../services/api';
 import * as Exports from '../../services/export';
 import { analyticsService, EVENT_CATEGORIES, EVENT_ACTIONS } from '../../services/analytics';
-import { getAngularService, dispatch, getState, runAngularViewerTransition } from '../../helpers/migration';
+import { dispatch, getState } from '../../helpers/migration';
 import { prepareIssue } from '../../helpers/issues';
 import { prepareComments, prepareComment, createAttachResourceComments,
 	createRemoveResourceComment } from '../../helpers/comments';
@@ -49,6 +51,7 @@ import { EXTENSION_RE } from '../../constants/resources';
 import { selectIfcSpacesHidden, TreeActions } from '../tree';
 import { CHAT_CHANNELS } from '../../constants/chat';
 import { ChatActions } from '../chat';
+import { ROUTES } from '../../constants/routes';
 
 function* fetchIssues({teamspace, modelId, revision}) {
 	yield put(IssuesActions.togglePendingState(true));
@@ -507,14 +510,15 @@ function* setActiveIssue({ issue, revision }) {
 	}
 }
 
+function* goToIssue(teamspace, model, revision, issueId?) {
+	const path = [ROUTES.VIEWER, teamspace, model, revision].filter(Boolean).join('/');
+	const query = issueId ? `?${issueId}` : '';
+	yield put(push(`${path}${query}`));
+}
+
 function* showDetails({ teamspace, model, revision, issue }) {
 	try {
-		runAngularViewerTransition({
-			account: teamspace,
-			model,
-			revision,
-			issueId: issue._id
-		});
+		yield goToIssue(teamspace, model, revision, issue._id);
 
 		yield put(IssuesActions.setActiveIssue(issue, revision));
 		yield put(IssuesActions.setComponentState({ showDetails: true }));
@@ -529,12 +533,7 @@ function* closeDetails({ teamspace, model, revision }) {
 		yield Viewer.removePin({ id: NEW_PIN_ID });
 
 		if (activeIssue) {
-			runAngularViewerTransition({
-				account: teamspace,
-				model,
-				revision,
-				issueId: null
-			});
+			yield goToIssue(teamspace, model, revision);
 		}
 
 		yield put(IssuesActions.setComponentState({ showDetails: false }));
