@@ -60,7 +60,8 @@ export const { Types: ViewerTypes, Creators: ViewerActions } = createActions({
 	zoomToHighlightedMeshes: [],
 	setCamera: ['params'],
 	changePinColor: ['params'],
-	removeUnsavedPin: []
+	removeUnsavedPin: [],
+	loadModel: ['teamspace', 'model', 'revision']
 }, { prefix: 'VIEWER/' });
 
 export const INITIAL_STATE = {

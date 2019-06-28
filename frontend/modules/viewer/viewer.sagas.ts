@@ -88,11 +88,11 @@ function* stopListenOnModelLoaded() {
 }
 
 function* startListenOnNumClip() {
-/* 	try {
+	try {
 		Viewer.on(VIEWER_EVENTS.UPDATE_NUM_CLIP, updateClipStateCallback);
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('start listen on', 'num clip'));
-	} */
+	}
 }
 
 function* stopListenOnNumClip() {
@@ -341,6 +341,14 @@ function* removeUnsavedPin() {
 	}
 }
 
+function* loadModel({ teamspace, model, revision }) {
+	try {
+		yield Viewer.loadViewerModel(teamspace, model, 'master', revision || 'head');
+	} catch (error) {
+		yield put(DialogActions.showErrorDialog('load', 'model'));
+	}
+}
+
 export default function* ViewerSaga() {
 	yield takeLatest(ViewerTypes.WAIT_FOR_VIEWER, waitForViewer);
 	yield takeLatest(ViewerTypes.MAP_INITIALISE, mapInitialise);
@@ -371,4 +379,5 @@ export default function* ViewerSaga() {
 	yield takeLatest(ViewerTypes.SET_CAMERA, setCamera);
 	yield takeLatest(ViewerTypes.CHANGE_PIN_COLOR, changePinColor);
 	yield takeLatest(ViewerTypes.REMOVE_UNSAVED_PIN, removeUnsavedPin);
+	yield takeLatest(ViewerTypes.LOAD_MODEL, loadModel);
 }
