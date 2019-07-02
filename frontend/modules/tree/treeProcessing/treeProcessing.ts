@@ -3,10 +3,15 @@ import { ITreeProcessingData } from './treeProcessing.constants';
 import transformTree from './transforming';
 
 class TreeProcessing {
-	private processing: Processing;
+	private resolves = {} as any;
+	private rejects = {} as any;
+	private loaderWorker;
+	private processing = {
+		clearCurrentlySelected: Function.prototype
+	} as Processing;
 
 	get data() {
-		return (this.processing || {}) as ITreeProcessingData;
+		return (this.processing) as ITreeProcessingData;
 	}
 
 	public transformData = async (payload) => {
