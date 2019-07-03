@@ -215,7 +215,7 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 				renderNotCollapsable={() => this.renderLogList(comments && !!comments.length && !this.isNewIssue)}
 				handleHeaderClick={() => {
 					if (!this.isNewIssue) { // if its a new issue it shouldnt go to the viewpoint
-						this.setCameraOnViewpoint({viewpoint: this.issueData.viewpoint});
+						this.setCameraOnViewpoint({ viewpoint: this.issueData.viewpoint });
 					}
 				}}
 				scrolled={this.state.scrolled}
@@ -256,10 +256,12 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 		const viewpoint = await viewer.getCurrentViewpoint({ teamspace, model });
 
 		if (this.isNewIssue) {
-			this.props.setState({ newIssue: {
-				...this.issueData,
-				descriptionThumbnail: screenshot
-			}});
+			this.props.setState({
+				newIssue: {
+					...this.issueData,
+					descriptionThumbnail: screenshot
+				}
+			});
 		} else {
 			this.setCommentData({ screenshot, viewpoint });
 		}

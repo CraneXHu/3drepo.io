@@ -61,10 +61,12 @@ interface IProps {
 	hideScreenshot?: boolean;
 	showResidualRiskInput?: boolean;
 	onSave: (commentData, finishSubmitting) => void;
+	viewer: any;
 	onTakeScreenshot: (screenshot) => void;
 	showScreenshotDialog: (options) => void;
 	setDisabled: (isDisabled) => void;
 	deactivateMeasure: () => void;
+	setIsPinDropMode: (mode: boolean) => void;
 }
 
 interface IState {
@@ -109,7 +111,7 @@ export class NewCommentForm extends React.PureComponent<IProps, IState> {
 	}
 
 	public componentWillUnmount() {
-		Viewer.setPinDropMode(false);
+		this.props.viewer.setPinDropMode(false);
 		this.props.setDisabled(false);
 	}
 
