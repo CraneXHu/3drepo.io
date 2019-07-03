@@ -17,7 +17,6 @@
 
 import * as React from 'react';
 
-import { Viewer } from '../../../../../../services/viewer/viewer';
 import { renderWhenTrue } from '../../../../../../helpers/rendering';
 import { Container } from '../../../risks/components/riskDetails/riskDetails.styles';
 import { ViewerPanelContent, ViewerPanelFooter } from '../../../viewerPanel/viewerPanel.styles';
@@ -27,13 +26,13 @@ import { canComment } from '../../../../../../helpers/issues';
 import { LogList } from '../../../../../components/logList/logList.component';
 import NewCommentForm from '../../../newCommentForm/newCommentForm.container';
 import { EmptyStateInfo } from '../../../views/views.styles';
-import { timingSafeEqual } from 'crypto';
 import { NEW_PIN_ID } from '../../../../../../constants/viewer';
 import { PIN_COLORS } from '../../../../../../styles';
 import { diffData, mergeData } from '../../../../../../helpers/forms';
 import { exportIssuesToJSON } from '../../../../../../services/export';
 
 interface IProps {
+	viewer: any;
 	jobs: any[];
 	topicTypes: any[];
 	issue: any;
@@ -253,8 +252,8 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 	}
 
 	public handleNewScreenshot = async (screenshot) => {
-		const { teamspace, model } = this.props;
-		const viewpoint = await Viewer.getCurrentViewpoint({ teamspace, model });
+		const { teamspace, model, viewer } = this.props;
+		const viewpoint = await viewer.getCurrentViewpoint({ teamspace, model });
 
 		if (this.isNewIssue) {
 			this.props.setState({ newIssue: {
@@ -271,7 +270,7 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 	}
 
 	public postComment = async (teamspace, model, { comment, screenshot }, finishSubmitting) => {
-		const viewpoint = await Viewer.getCurrentViewpoint({ teamspace, model });
+		const viewpoint = await this.props.viewer.getCurrentViewpoint({ teamspace, model });
 		const issueCommentData = {
 			_id: this.issueData._id,
 			comment,
@@ -294,20 +293,18 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 	}
 
 	public onPositionSave = (position) => {
+		const { teamspace, model, viewer } = this.props;
 		if (!this.isNewIssue) {
-			const { teamspace, model, issue } = this.props;
 			this.props.updateIssue(teamspace, model, {position: position || []});
-			Viewer.setPin(null);
+			viewer.setPin(null);
 		} else {
-			Viewer.changePinColor({ id: NEW_PIN_ID, colours: PIN_COLORS.YELLOW });
+			viewer.changePinColor({ id: NEW_PIN_ID, colours: PIN_COLORS.YELLOW });
 		}
 	}
 
-	public renderFailedState = renderWhenTrue(() => {
-		return (
-			<EmptyStateInfo>Issue failed to load</EmptyStateInfo>
-		);
-	});
+	public renderFailedState = renderWhenTrue(() => (
+		<EmptyStateInfo>Issue failed to load</EmptyStateInfo>
+	));
 
 	public render() {
 		const { failedToLoad, issue } = this.props;

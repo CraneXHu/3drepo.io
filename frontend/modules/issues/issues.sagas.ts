@@ -28,7 +28,7 @@ import { prepareIssue } from '../../helpers/issues';
 import { prepareComments, prepareComment, createAttachResourceComments,
 	createRemoveResourceComment } from '../../helpers/comments';
 import { Cache } from '../../services/cache';
-import { Viewer } from '../../services/viewer/viewer';
+//import { Viewer } from '../../services/viewer/viewer';
 import { PRIORITIES, STATUSES, DEFAULT_PROPERTIES } from '../../constants/issues';
 import { PIN_COLORS } from '../../styles';
 import { DialogActions } from '../dialog';
@@ -52,6 +52,7 @@ import { selectIfcSpacesHidden, TreeActions } from '../tree';
 import { CHAT_CHANNELS } from '../../constants/chat';
 import { ChatActions } from '../chat';
 import { ROUTES } from '../../constants/routes';
+import { ViewerHelpers } from '../viewer';
 
 function* fetchIssues({teamspace, modelId, revision}) {
 	yield put(IssuesActions.togglePendingState(true));
@@ -143,9 +144,9 @@ export function* saveIssue({ teamspace, model, issueData, revision, finishSubmit
 		const ifcSpacesHidden = yield select(selectIfcSpacesHidden);
 
 		const [viewpoint, objectInfo, screenshot, userJob] = yield all([
-			Viewer.getCurrentViewpoint({ teamspace, model }),
-			Viewer.getObjectsStatus(),
-			issueData.descriptionThumbnail || Viewer.getScreenshot(),
+			ViewerHelpers.getCurrentViewpoint({ teamspace, model }),
+			ViewerHelpers.getObjectsStatus(),
+			issueData.descriptionThumbnail || ViewerHelpers.getScreenshot(),
 			myJob
 		]);
 
