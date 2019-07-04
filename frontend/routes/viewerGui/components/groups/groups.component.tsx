@@ -22,7 +22,6 @@ import AddIcon from '@material-ui/icons/Add';
 import ArrowBack from '@material-ui/icons/ArrowBack';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Check from '@material-ui/icons/Check';
-import GroupWork from '@material-ui/icons/GroupWork';
 import SearchIcon from '@material-ui/icons/Search';
 import Delete from '@material-ui/icons/Delete';
 import InvertColors from '@material-ui/icons/InvertColors';
@@ -40,7 +39,6 @@ import { hexToRgba } from '../../../../helpers/colors';
 import { hasPermissions } from '../../../../helpers/permissions';
 import { renderWhenTrue } from '../../../../helpers/rendering';
 import { searchByFilters } from '../../../../helpers/searching';
-import { Viewer } from '../../../../services/viewer/viewer';
 import { ButtonMenu } from '../../../components/buttonMenu/buttonMenu.component';
 import {
 	IconWrapper,
@@ -51,7 +49,6 @@ import {
 import { FilterPanel } from '../../../components/filterPanel/filterPanel.component';
 import { TooltipButton } from '../../../teamspaces/components/tooltipButton/tooltipButton.component';
 import { ListNavigation } from '../listNavigation/listNavigation.component';
-import { ViewerPanel } from '../viewerPanel/viewerPanel.component';
 import { ViewerPanelButton, ViewerPanelContent, ViewerPanelFooter } from '../viewerPanel/viewerPanel.styles';
 import { EmptyStateInfo } from '../views/views.styles';
 import { ListContainer, Summary } from './../risks/risks.styles';
@@ -60,6 +57,7 @@ import { MenuButton as MenuButtonComponent } from '../../../components/menuButto
 import { GroupsContainer, GroupListItem, StyledIcon, GroupIcon } from './groups.styles';
 
 interface IProps {
+	viewer: any;
 	teamspace: string;
 	model: any;
 	revision?: string;
@@ -74,6 +72,7 @@ interface IProps {
 	selectedFilters: any[];
 	colorOverrides: any;
 	modelSettings: any;
+	isModelLoaded: boolean;
 	setState: (componentState: any) => void;
 	setNewGroup: () => void;
 	showGroupDetails: (group, revision?) => void;
@@ -93,7 +92,6 @@ interface IProps {
 }
 
 interface IState {
-	modelLoaded: boolean;
 	filteredGroups: any[];
 }
 
@@ -101,20 +99,15 @@ const MenuButton = (props) => <MenuButtonComponent ariaLabel="Show groups menu" 
 
 export class Groups extends React.PureComponent<IProps, IState> {
 	public state = {
-		modelLoaded: false,
 		filteredGroups: []
 	};
 
 	public groupsContainerRef = React.createRef<any>();
 
-	public componentDidMount() {
+	public async componentDidMount() {
 		const { subscribeOnChanges, teamspace, model } = this.props;
 
 		this.setState({ filteredGroups: this.filteredGroups });
-
-		if (Viewer.viewer.model && !this.state.modelLoaded) {
-			this.setState({ modelLoaded: true });
-		}
 
 		this.toggleViewerEvents();
 		subscribeOnChanges(teamspace, model);
@@ -181,10 +174,10 @@ export class Groups extends React.PureComponent<IProps, IState> {
 
 	public toggleViewerEvents = (enabled = true) => {
 		const eventHandler = enabled ? 'on' : 'off';
-		Viewer[eventHandler](VIEWER_EVENTS.MODEL_LOADED, () => {
+		this.props.viewer[eventHandler](VIEWER_EVENTS.MODEL_LOADED, () => {
 			this.setState({ modelLoaded: true });
 		});
-		Viewer[eventHandler](VIEWER_EVENTS.BACKGROUND_SELECTED, this.resetActiveGroup);
+		this.props.viewer[eventHandler](VIEWER_EVENTS.BACKGROUND_SELECTED, this.resetActiveGroup);
 	}
 
 	public getOverriddenColor = (groupId, color) => {
@@ -297,8 +290,9 @@ export class Groups extends React.PureComponent<IProps, IState> {
 	public isOverridden = (groupId) => this.props.colorOverrides.includes(groupId);
 
 	public get canAddOrUpdate() {
-		if (this.props.modelSettings && this.props.modelSettings.permissions) {
-			return hasPermissions(CREATE_ISSUE, this.props.modelSettings.permissions) && this.state.modelLoaded;
+		const { isModelLoaded, modelSettings } = this.props;
+		if (isModelLoaded && modelSettings && modelSettings.permissions) {
+			return hasPermissions(CREATE_ISSUE, modelSettings.permissions);
 		}
 		return false;
 	}
@@ -326,19 +320,19 @@ export class Groups extends React.PureComponent<IProps, IState> {
 				label="Isolate"
 				action={this.handleGroupIsolate(group)}
 				Icon={Visibility}
-				disabled={!this.state.modelLoaded}
+				disabled={!this.props.isModelLoaded}
 			/>
 			<TooltipButton
 				label="Toggle Colour Override"
 				action={this.handleColorOverride(group)}
 				Icon={this.renderTintIcon(group)}
-				disabled={!this.state.modelLoaded}
+				disabled={!this.props.isModelLoaded}
 			/>
 			<TooltipButton
 				label="Delete"
 				action={this.handleGroupDelete(group._id)}
 				Icon={Delete}
-				disabled={!this.state.modelLoaded}
+				disabled={!this.props.isModelLoaded}
 			/>
 		</>
 	)
@@ -368,7 +362,7 @@ export class Groups extends React.PureComponent<IProps, IState> {
 				onItemClick={this.setActiveGroup(group)}
 				onArrowClick={this.handleShowGroupDetails(group)}
 				active={this.isActive(group)}
-				modelLoaded={this.state.modelLoaded}
+				modelLoaded={this.props.isModelLoaded}
 				renderActions={this.renderGroupActions(group)}
 				hasViewPermission={stubTrue}
 				panelName={GROUP_PANEL_NAME}
