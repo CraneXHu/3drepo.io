@@ -23,7 +23,7 @@ import { push } from 'connected-react-router';
 import * as API from '../../services/api';
 import * as Exports from '../../services/export';
 import { analyticsService, EVENT_CATEGORIES, EVENT_ACTIONS } from '../../services/analytics';
-import { dispatch, getState } from '../../helpers/migration';
+import { dispatch, getState } from '../store';
 import { prepareIssue } from '../../helpers/issues';
 import { prepareComments, prepareComment, createAttachResourceComments,
 	createRemoveResourceComment } from '../../helpers/comments';
