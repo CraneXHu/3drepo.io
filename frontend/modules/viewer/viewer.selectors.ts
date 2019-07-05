@@ -83,7 +83,3 @@ export const selectIsClipEdit = createSelector(
 export const selectClipNumber = createSelector(
 	selectViewerDomain, (state) => state.clipNumber
 );
-
-export const selectIsModelLoaded = createSelector(
-	selectViewerDomain, (state) => state.isModelLoaded
-);
