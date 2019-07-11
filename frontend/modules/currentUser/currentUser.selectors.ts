@@ -18,7 +18,7 @@
 import { createSelector } from 'reselect';
 import { isNil } from 'lodash';
 
-const selectCurrentUserDomain = (state) => Object.assign({}, state.currentUser);
+const selectCurrentUserDomain = (state) => ({...state.currentUser});
 
 export const selectCurrentTeamspace = createSelector(
 	selectCurrentUserDomain, (state) => state.currentTeamspace
