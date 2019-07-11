@@ -95,6 +95,77 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 		return [...this.props.jobs, UNASSIGNED_JOB];
 	}
 
+	public commentRef = React.createRef<any>();
+
+	public renderLogList = renderWhenTrue(() => (
+		<LogList
+			commentsRef={this.commentsRef}
+			items={this.issueData.comments}
+			isPending={this.props.fetchingDetailsIsPending}
+			removeLog={this.removeComment}
+			teamspace={this.props.teamspace}
+			currentUser={this.props.currentUser.username}
+			setCameraOnViewpoint={this.setCameraOnViewpoint}
+		/>
+	));
+
+	public renderPreview = renderWhenTrue(() => {
+		const { expandDetails } = this.props;
+		const { comments } = this.issueData;
+
+		return (
+			<PreviewDetails
+				{...this.issueData}
+				key={this.issueData._id}
+				defaultExpanded={expandDetails}
+				editable={!this.issueData._id}
+				onNameChange={this.handleNameChange}
+				onExpandChange={this.handleExpandChange}
+				renderCollapsable={this.renderDetailsForm}
+				renderNotCollapsable={() => this.renderLogList(comments && !!comments.length && !this.isNewIssue)}
+				handleHeaderClick={() => {
+					if (!this.isNewIssue) { // if its a new issue it shouldnt go to the viewpoint
+						this.setCameraOnViewpoint({ viewpoint: this.issueData.viewpoint });
+					}
+				}}
+				scrolled={this.state.scrolled}
+			/>
+		);
+	});
+
+	public renderFooter = renderWhenTrue(() => (
+		<ViewerPanelFooter alignItems="center" padding="0">
+			<NewCommentForm
+				comment={this.props.newComment.comment}
+				screenshot={this.props.newComment.screenshot}
+				viewpoint={this.props.newComment.viewpoint}
+				formRef={this.formRef}
+				onTakeScreenshot={this.handleNewScreenshot}
+				onSave={this.handleSave}
+				canComment={this.userCanComment()}
+				hideComment={this.isNewIssue}
+			/>
+		</ViewerPanelFooter>
+	));
+
+	public renderFailedState = renderWhenTrue(() => (
+		<EmptyStateInfo>Issue failed to load</EmptyStateInfo>
+	));
+
+	public componentDidMount() {
+		const { teamspace, model, fetchIssue, issue, subscribeOnIssueCommentsChanges } = this.props;
+
+		if (issue._id) {
+			fetchIssue(teamspace, model, issue._id);
+			subscribeOnIssueCommentsChanges(teamspace, model, issue._id);
+		}
+	}
+
+	public componentWillUnmount() {
+		const { teamspace, model, issue, unsubscribeOnIssueCommentsChanges } = this.props;
+		unsubscribeOnIssueCommentsChanges(teamspace, model, issue._id);
+	}
+
 	public componentDidUpdate(prevProps) {
 		const { issue } = this.props;
 
@@ -177,20 +248,6 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 		this.props.setCameraOnViewpoint(this.props.teamspace, this.props.model, viewpoint);
 	}
 
-	public renderLogList = renderWhenTrue(() => {
-		return (
-			<LogList
-				commentsRef={this.commentsRef}
-				items={this.issueData.comments}
-				isPending={this.props.fetchingDetailsIsPending}
-				removeLog={this.removeComment}
-				teamspace={this.props.teamspace}
-				currentUser={this.props.currentUser.username}
-				setCameraOnViewpoint={this.setCameraOnViewpoint}
-			/>
-		);
-	});
-
 	public handlePanelScroll = (e) => {
 		if (e.target.scrollTop > 0 && !this.state.scrolled) {
 			this.setState({ scrolled: true });
@@ -200,49 +257,10 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 		}
 	}
 
-	public renderPreview = renderWhenTrue(() => {
-		const { expandDetails } = this.props;
-		const { comments } = this.issueData;
-
-		return (
-			<PreviewDetails
-				{...this.issueData}
-				key={this.issueData._id}
-				defaultExpanded={expandDetails}
-				editable={!this.issueData._id}
-				onNameChange={this.handleNameChange}
-				onExpandChange={this.handleExpandChange}
-				renderCollapsable={this.renderDetailsForm}
-				renderNotCollapsable={() => this.renderLogList(comments && !!comments.length && !this.isNewIssue)}
-				handleHeaderClick={() => {
-					if (!this.isNewIssue) { // if its a new issue it shouldnt go to the viewpoint
-						this.setCameraOnViewpoint({ viewpoint: this.issueData.viewpoint });
-					}
-				}}
-				scrolled={this.state.scrolled}
-			/>
-		);
-	});
-
 	public userCanComment() {
 		const { myJob, settings, currentUser } = this.props;
 		return canComment(this.issueData, myJob, settings.permissions, currentUser.username);
 	}
-
-	public renderFooter = renderWhenTrue(() => (
-		<ViewerPanelFooter alignItems="center" padding="0">
-			<NewCommentForm
-				comment={this.props.newComment.comment}
-				screenshot={this.props.newComment.screenshot}
-				viewpoint={this.props.newComment.viewpoint}
-				formRef={this.formRef}
-				onTakeScreenshot={this.handleNewScreenshot}
-				onSave={this.handleSave}
-				canComment={this.userCanComment()}
-				hideComment={this.isNewIssue}
-			/>
-		</ViewerPanelFooter>
-	));
 
 	public setCommentData = (commentData = {}) => {
 		const newComment = {
@@ -304,10 +322,6 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 			viewer.changePinColor({ id: NEW_PIN_ID, colours: PIN_COLORS.YELLOW });
 		}
 	}
-
-	public renderFailedState = renderWhenTrue(() => (
-		<EmptyStateInfo>Issue failed to load</EmptyStateInfo>
-	));
 
 	public render() {
 		const { failedToLoad, issue } = this.props;
