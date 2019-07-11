@@ -44,6 +44,17 @@ class TreeProcessing {
 	public getParents = (node) => this.processing.getParents(node);
 
 	public getChildren = (node) => this.processing.getChildren(node);
+
+	private handleError = (e) => {
+		// tslint:disable-next-line
+		console.error('Worker error', e);
+
+		for (const reject in this.rejects) {
+			if (this.rejects.hasOwnProperty(reject)) {
+				this.rejects[reject]();
+			}
+		}
+	}
 }
 
 export default new TreeProcessing();
