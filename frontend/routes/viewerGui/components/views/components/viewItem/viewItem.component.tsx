@@ -17,7 +17,7 @@
 
 import { debounce } from 'lodash';
 import { Field, Formik } from 'formik';
-import * as React from 'react';
+import React from 'react';
 
 import { renderWhenTrue } from '../../../../../../helpers/rendering';
 import { Image } from '../../../../../components/image';
