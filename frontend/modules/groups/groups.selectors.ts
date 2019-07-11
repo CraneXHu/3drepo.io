@@ -15,8 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createSelector } from 'reselect';
 import { size, values } from 'lodash';
+import { createSelector } from 'reselect';
 import { searchByFilters } from '../../helpers/searching';
 import GroupsSaga from './groups.sagas';
 import { getGroupOverride } from '../../helpers/colorOverrides';

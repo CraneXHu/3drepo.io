@@ -15,15 +15,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from 'react';
 import { TextFieldProps } from '@material-ui/core/TextField';
-import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
-import EditIcon from '@material-ui/icons/Edit';
+import SaveIcon from '@material-ui/icons/Save';
+import * as React from 'react';
 
-import { Container, ActionsLine, StyledIconButton,
-		StyledTextField, StyledLinkableField, FieldLabel, MutableActionsLine } from './textField.styles';
-import { Formik, Field } from 'formik';
+import { Field, Formik } from 'formik';
+import { ActionsLine, Container, StyledIconButton, StyledTextField } from './textField.styles';
 
 interface IProps extends TextFieldProps {
 	className?: string;

@@ -15,16 +15,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import styled from 'styled-components';
 import { Form } from 'formik';
+import styled from 'styled-components';
 
-import {
-	ExpansionPanel,
-	IconButton,
-	ExpansionPanelDetails,
-	ExpansionPanelSummary,
-	Typography as TypographyComponent
-} from '@material-ui/core';
+import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, IconButton } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import { COLOR } from './../../../../styles/colors';

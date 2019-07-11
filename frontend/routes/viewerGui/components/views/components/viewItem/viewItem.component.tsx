@@ -15,28 +15,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from 'react';
-import { Formik, Field } from 'formik';
 import { debounce } from 'lodash';
+import { Field, Formik } from 'formik';
+import * as React from 'react';
 
 import { renderWhenTrue } from '../../../../../../helpers/rendering';
 import { Image } from '../../../../../components/image';
 
+import { ActionMessage } from '../../../../../components/actionMessage/actionMessage.component';
 import {
-	ViewpointItem,
-	StyledForm,
-	ThumbnailPlaceholder,
 	IconsGroup,
-	StyledDeleteIcon,
-	StyledEditIcon,
-	StyledCancelIcon,
-	NewViewpointName,
 	Name,
 	NameRow,
+	NewViewpointName,
 	SaveIconButton,
-	StyledSaveIcon
+	StyledCancelIcon,
+	StyledDeleteIcon,
+	StyledEditIcon,
+	StyledForm,
+	StyledSaveIcon,
+	ThumbnailPlaceholder,
+	ViewpointItem
 } from './viewItem.styles';
-import { ActionMessage } from '../../../../../components/actionMessage/actionMessage.component';
 
 interface IProps {
 	viewpoint: any;

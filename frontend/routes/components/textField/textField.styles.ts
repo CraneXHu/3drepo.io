@@ -15,11 +15,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import styled from 'styled-components';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
 import { LinkableField } from '../linkableField/linkableField.component';
 import { InputLabel } from '@material-ui/core';
+
+import styled from 'styled-components';
 
 export const Container = styled.div`
 	position: relative;
