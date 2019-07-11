@@ -72,7 +72,6 @@ const NewCommentSchema = Yup.object().shape({
 });
 
 export class NewCommentForm extends React.PureComponent<IProps, IState> {
-
 	get commentTypeIcon() {
 		return this.state.isResidualRiskInputActive ? ReportProblemIcon : ShortTextIcon;
 	}
@@ -200,7 +199,7 @@ export class NewCommentForm extends React.PureComponent<IProps, IState> {
 				</StyledFormControl>
 			</FieldsRow>
 
-			<Field name="mitigation_desc" render={({ field, form }) => (
+			<Field name="mitigation_desc" render={({ field }) => (
 				<StyledTextField
 					{...field}
 					multiline
@@ -219,7 +218,7 @@ export class NewCommentForm extends React.PureComponent<IProps, IState> {
 			this.setState({
 				newScreenshot: this.props.screenshot
 			});
-			this.props.innerRef.current.setFieldValue('screenshot', this.props.screenshot);
+			this.props.formRef.current.setFieldValue('screenshot', this.props.screenshot);
 		}
 	}
 
