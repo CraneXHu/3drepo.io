@@ -21,7 +21,7 @@ import React from 'react';
 
 import Folder from '@material-ui/icons/Folder';
 import FolderOpen from '@material-ui/icons/FolderOpen';
-import { Container, Details, Headline, IconContainer, Title } from './treeList.styles';
+import { Container, Details, Headline, IconContainer, Title, GridContainer } from './treeList.styles';
 
 export const TREE_LEVELS = {
 	TEAMSPACE: 1,
@@ -155,6 +155,17 @@ export class TreeList extends React.PureComponent<IProps, IState> {
 			hovered,
 			renderActions: this.props.renderActions
 		};
+
+		// mocked Grid
+		if (this.props.level === 3) {
+			console.log('level', this.props);
+
+			return (
+				<GridContainer>
+					{this.renderItems()}
+				</GridContainer>
+			);
+		}
 
 		return (
 			<Container {...containerProps}>

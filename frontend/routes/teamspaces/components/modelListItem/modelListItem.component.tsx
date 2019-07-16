@@ -30,7 +30,7 @@ import { Loader } from '../../../components/loader/loader.component';
 import { LONG_DATE_TIME_FORMAT } from '../../../../services/formatting/formatDate';
 import { ROW_ACTIONS } from '../../teamspaces.contants';
 import { RowMenu } from '../rowMenu/rowMenu.component';
-import { Container, LinkedName, Name, Status, SubmodelsList, Time, TimeWrapper } from './modelItem.styles';
+import { Container, LinkedName, Name, Status, SubmodelsList, Time, TimeWrapper } from './modelListItem.styles';
 
 interface IAction {
 	label: string;
@@ -68,7 +68,7 @@ interface IState {
 const isPendingStatus = (status) => status &&
 	status === 'uploading' || status === 'queued' || status === 'processing';
 
-export class ModelItem extends React.PureComponent<IProps, IState> {
+export class ModelListItem extends React.PureComponent<IProps, IState> {
 	public state = {
 		hovered: false,
 		statusText: '',

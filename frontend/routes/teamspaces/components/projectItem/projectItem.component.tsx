@@ -23,7 +23,7 @@ import React from 'react';
 import { hasPermissions } from '../../../../helpers/permissions';
 import { renderWhenTrue } from '../../../../helpers/rendering';
 import { TreeList, TREE_LEVELS } from '../../../components/treeList/treeList.component';
-import { FEDERATION_TYPE, MODEL_TYPE, ROW_ACTIONS  } from '../../teamspaces.contants';
+import { FEDERATION_TYPE, MODEL_TYPE, ROW_ACTIONS } from '../../teamspaces.contants';
 import { RowMenu } from '../rowMenu/rowMenu.component';
 import { TooltipButton } from '../tooltipButton/tooltipButton.component';
 
