@@ -312,17 +312,45 @@ export class Teamspaces extends React.PureComponent<IProps, IState> {
 	/**
 	 * Render methods
 	 */
-	public renderModel = (props) => {
+	public renderListItemModel = (props) => {
 		const type = props.federate ? FEDERATION_TYPE : MODEL_TYPE;
 		const { activeTeamspace } = this.state;
 		const { match } = this.props;
 
 		return (
-			<ModelGridItem {...props} />
+			<ModelListItem
+				{...props}
+				key={props.model}
+				activeTeamspace={activeTeamspace}
+				actions={[]}
+				onModelItemClick={this.createModelItemClickHandler(props)}
+				onPermissionsClick={this.createRouteHandler(`/dashboard/user-management/${activeTeamspace}/projects`, {
+					project: props.projectName,
+					view: PERMISSIONS_VIEWS.MODELS,
+					modelId: props.model
+				})}
+				onSettingsClick={this.createRouteHandler(`${match.url}/${activeTeamspace}/models/${props.model}`, {
+					project: props.projectName
+				})}
+				onDeleteClick={this.createRemoveModelHandler(props.name, props.model, props.projectName, type)}
+				onDownloadClick={this.createDownloadModelHandler(this.state.activeTeamspace, props.model)}
+				onRevisionsClick={this.openModelRevisionsDialog(props)}
+				onModelUpload={this.openUploadModelFileDialog(this.state.activeTeamspace, props)}
+				onEditClick={this.openFederationDialog(this.state.activeTeamspace, props.projectName, props.name, props.model)}
+			/>
 		);
+	}
+
+	/**
+	 * Render methods
+	 */
+	public renderGridItemModel = (props) => {
+		const type = props.federate ? FEDERATION_TYPE : MODEL_TYPE;
+		const { activeTeamspace } = this.state;
+		const { match } = this.props;
 
 		return (
-			<ModelListItem
+			<ModelGridItem
 				{...props}
 				key={props.model}
 				activeTeamspace={activeTeamspace}
@@ -352,7 +380,19 @@ export class Teamspaces extends React.PureComponent<IProps, IState> {
 	}
 
 	public renderModelDirectoryItem = (projectName) =>
-		(modelProps) => this.renderModel({ ...modelProps, projectName })
+		(modelProps) => {
+			// mocked Grid TODO: remove after
+			if (
+				modelProps.name === 'Lego_House_Federation' ||
+				modelProps.name === 'Lego_House_Architecture' ||
+				modelProps.name === 'Lego_House_Structure' ||
+				modelProps.name === 'Lego_House_Landscape' ||
+				modelProps.name === 'Test fed 2'
+			) {
+				return this.renderGridItemModel({ ...modelProps, projectName })
+			}
+			return this.renderListItemModel({ ...modelProps, projectName })
+		}
 
 	public renderModelDirectory = (permissions, props) => (
 		<ModelDirectoryItem
