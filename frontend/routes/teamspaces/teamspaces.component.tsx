@@ -211,6 +211,11 @@ export class Teamspaces extends React.PureComponent<IProps, IState> {
 		});
 	}
 
+	public createShareModelHandler = (props) => (event) => {
+		event.stopPropagation();
+		console.log('Share model', props);
+	}
+
 	public openModelDialog =
 		(teamspaceName = '', projectName = '', modelName = '', modelId = '') => (event) => {
 		event.stopPropagation();
@@ -364,6 +369,7 @@ export class Teamspaces extends React.PureComponent<IProps, IState> {
 				onSettingsClick={this.createRouteHandler(`${match.url}/${activeTeamspace}/models/${props.model}`, {
 					project: props.projectName
 				})}
+				onShareClick={this.createShareModelHandler(props)}
 				onDeleteClick={this.createRemoveModelHandler(props.name, props.model, props.projectName, type)}
 				onDownloadClick={this.createDownloadModelHandler(this.state.activeTeamspace, props.model)}
 				onRevisionsClick={this.openModelRevisionsDialog(props)}
@@ -382,16 +388,7 @@ export class Teamspaces extends React.PureComponent<IProps, IState> {
 	public renderModelDirectoryItem = (projectName) =>
 		(modelProps) => {
 			// mocked Grid TODO: remove after
-			if (
-				modelProps.name === 'Lego_House_Federation' ||
-				modelProps.name === 'Lego_House_Architecture' ||
-				modelProps.name === 'Lego_House_Structure' ||
-				modelProps.name === 'Lego_House_Landscape' ||
-				modelProps.name === 'Test fed 2'
-			) {
-				return this.renderGridItemModel({ ...modelProps, projectName })
-			}
-			return this.renderListItemModel({ ...modelProps, projectName })
+			return this.renderGridItemModel({ ...modelProps, projectName });
 		}
 
 	public renderModelDirectory = (permissions, props) => (
