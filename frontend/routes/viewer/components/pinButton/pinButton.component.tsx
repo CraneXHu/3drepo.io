@@ -16,11 +16,11 @@
  */
 
 import * as React from 'react';
+import { NEW_PIN_ID, VIEWER_EVENTS } from '../../../../constants/viewer';
 import { Viewer } from '../../../../services/viewer/viewer';
-import { VIEWER_EVENTS, NEW_PIN_ID } from '../../../../constants/viewer';
 import { PIN_COLORS } from '../../../../styles';
-import { PinIcon, Container } from './pinButton.styles';
 import { LabelButton } from '../labelButton/labelButton.styles';
+import { Container, PinIcon } from './pinButton.styles';
 
 interface IProps {
 	onChange: (pin) => void;
@@ -114,7 +114,7 @@ export class PinButton extends React.PureComponent<IProps, any> {
 
 		return (
 				<Container>
-					<PinIcon color={pinIConColor}/>
+					<PinIcon color={pinIConColor} />
 					<LabelButton disabled={disabled} onClick={this.onClickButton}>{pinLabel}</LabelButton>
 				</Container>
 				);

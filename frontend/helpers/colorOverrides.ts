@@ -14,10 +14,10 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import { getState } from './migration';
-import { hexToGLColor } from './colors';
+
+import { selectGetMeshesByIds, selectGetNodesIdsFromSharedIds, selectTreeNodesList } from '../modules/tree';
 import { Viewer } from '../services/viewer/viewer';
-import { selectTreeNodesList, selectGetNodesIdsFromSharedIds, selectGetMeshesByIds } from '../modules/tree';
+import { hexToGLColor } from './colors';
 
 export const getGroupOverride = (overrides, group) => {
 	const color = group.color;
@@ -58,7 +58,7 @@ export const addColorOverrides = async (overrides) => {
 	if (!overrides.length) {
 		return;
 	}
-	const treeNodes = selectTreeNodesList(getState());
+	const treeNodes = selectTreeNodesList(getState());  // TODO: migrate
 
 	for (let i = 0; i < overrides.length; i++) {
 		const override = overrides[i];
@@ -66,12 +66,12 @@ export const addColorOverrides = async (overrides) => {
 
 		if (treeNodes.length) {
 			const selectNodes = selectGetNodesIdsFromSharedIds([override]);
-			const nodes = selectNodes(getState());
+			const nodes = selectNodes(getState());  // TODO: migrate
 
 			if (nodes) {
 				const filteredNodes = nodes.filter((n) => n !== undefined);
 				const selectMeshes = selectGetMeshesByIds(filteredNodes);
-				const modelsList = selectMeshes(getState());
+				const modelsList = selectMeshes(getState());  // TODO: migrate
 
 				for (let j = 0; j < modelsList.length; j++) {
 					const { meshes, teamspace, modelId } = modelsList[j] as any;
@@ -87,19 +87,19 @@ export const removeColorOverrides =  async (overrides) => {
 		return;
 	}
 
-	const treeNodes = selectTreeNodesList(getState());
+	const treeNodes = selectTreeNodesList(getState());  // TODO: migrate
 
 	for (let i = 0; i < overrides.length; i++) {
 		const override = overrides[i];
 
 		if (treeNodes.length) {
 			const selectNodes = selectGetNodesIdsFromSharedIds([override]);
-			const nodes = selectNodes(getState());
+			const nodes = selectNodes(getState());  // TODO: migrate
 
 			if (nodes) {
 				const filteredNodes = nodes.filter((n) => n !== undefined);
 				const selectMeshes = selectGetMeshesByIds(filteredNodes);
-				const modelsList = selectMeshes(getState());
+				const modelsList = selectMeshes(getState()); // TODO: migrate
 
 				for (let j = 0; j < modelsList.length; j++) {
 					const { meshes, teamspace, modelId } = modelsList[j] as any;

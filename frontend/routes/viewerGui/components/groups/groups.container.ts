@@ -30,10 +30,10 @@ import {
 	selectGroups,
 	selectGroupsMap,
 	selectHighlightedGroups,
+	selectIsAllOverridden,
 	selectIsPending,
 	selectSearchEnabled,
-	selectSelectedFilters,
-	selectIsAllOverridden
+	selectSelectedFilters
 	selectShowDetails,
 	GroupsActions
 } from './../../../../modules/groups';

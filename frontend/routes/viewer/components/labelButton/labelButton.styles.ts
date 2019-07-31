@@ -14,8 +14,8 @@
  *  You should have received a copy of the GNU Affero General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import styled from 'styled-components';
 import { Button } from '@material-ui/core';
+import styled from 'styled-components';
 import { COLOR } from '../../../../styles';
 
 export const LabelButton = styled(Button).attrs({

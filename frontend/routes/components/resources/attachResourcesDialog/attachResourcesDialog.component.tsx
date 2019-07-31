@@ -17,14 +17,14 @@
 import { Form, Formik } from 'formik';
 import * as React from 'react';
 import * as Yup from 'yup';
-import { AttachResourceFiles } from './attachResourceFiles.component';
-import { AttachResourceUrls } from './attachResourceUrls.component';
+import { clientConfigService } from '../../../../services/clientConfig';
 import {
-		DialogTabs, DialogTab
+		DialogTab, DialogTabs
 		} from '../../topMenu/components/visualSettingsDialog/visualSettingsDialog.styles';
+import { AttachResourceFiles } from './attachResourceFiles.component';
 import { Container } from './attachResourcesDialog.styles';
 import { DialogButtons } from './attachResourcesDialogButtons';
-import { clientConfigService } from '../../../../services/clientConfig';
+import { AttachResourceUrls } from './attachResourceUrls.component';
 
 interface IProps {
 	handleClose: () => void;
@@ -127,7 +127,7 @@ export class AttachResourcesDialog extends React.PureComponent<IProps, IState> {
 										uploadLimit={clientConfigService.resourceUploadSizeLimit}
 									/>
 							}
-							{selectedTab === 1 && <AttachResourceUrls links={values.links}/>}
+							{selectedTab === 1 && <AttachResourceUrls links={values.links} />}
 								<DialogButtons
 									onClickCancel={this.onCancel}
 									validateQuota={this.validateQuota}

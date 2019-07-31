@@ -21,6 +21,7 @@ import { NEW_PIN_ID } from '../../../../../../constants/viewer';
 import { diffData, mergeData } from '../../../../../../helpers/forms';
 import { canComment } from '../../../../../../helpers/issues';
 import { renderWhenTrue } from '../../../../../../helpers/rendering';
+import { exportIssuesToJSON } from '../../../../../../services/export';
 import { PIN_COLORS } from '../../../../../../styles';
 import { LogList } from '../../../../../components/logList/logList.component';
 import NewCommentForm from '../../../newCommentForm/newCommentForm.container';
@@ -28,7 +29,6 @@ import { PreviewDetails } from '../../../previewDetails/previewDetails.component
 import { Container } from '../../../risks/components/riskDetails/riskDetails.styles';
 import { ViewerPanelContent, ViewerPanelFooter } from '../../../viewerPanel/viewerPanel.styles';
 import { EmptyStateInfo } from '../../../views/views.styles';
-import { exportIssuesToJSON } from '../../../../../../services/export';
 import { IssueDetailsForm } from './issueDetailsForm.component';
 
 interface IProps {

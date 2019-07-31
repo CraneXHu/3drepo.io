@@ -19,9 +19,9 @@ import IconButton from '@material-ui/core/IconButton';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Check from '@material-ui/icons/Check';
 import SearchIcon from '@material-ui/icons/Search';
+import { values } from 'lodash';
 import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { values } from 'lodash';
 import { FixedSizeList as List } from 'react-window';
 
 import { TREE_ACTIONS_ITEMS, TREE_ACTIONS_MENU, TREE_ITEM_SIZE } from '../../../../constants/tree';

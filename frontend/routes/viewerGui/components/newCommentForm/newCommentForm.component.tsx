@@ -87,49 +87,11 @@ export class NewCommentForm extends React.PureComponent<IProps, IState> {
 		return 'You are not able to comment';
 	}
 
-    public state = {
-        isPinActive: false,
-        newScreenshot: '',
-        isResidualRiskInputActive: this.props.showResidualRiskInput
-    };
-
-	public componentDidUpdate = (prevProps) => {
-		if (prevProps.screenshot !== this.props.screenshot) {
-			this.setState({
-				newScreenshot: this.props.screenshot
-			});
-			this.props.formRef.current.setFieldValue('screenshot', this.props.screenshot);
-		}
-	}
-
-	public componentWillUnmount() {
-		this.props.viewer.setPinDropMode(false);
-		this.props.setDisabled(false);
-	}
-
-	public handleSave = (values, form) => {
-		const screenshot = values.screenshot.substring(values.screenshot.indexOf(',') + 1);
-		const commentValues = { ...values, screenshot };
-		this.props.onSave(commentValues, () => {
-			form.resetForm();
-		});
-		this.setState({ newScreenshot: ''});
-	}
-
-	public handleNewScreenshot = async () => {
-		const { showScreenshotDialog, onTakeScreenshot, viewer } = this.props;
-
-		showScreenshotDialog({
-			sourceImage: viewer.getScreenshot(),
-			onSave: (screenshot) => onTakeScreenshot(screenshot)
-		});
-	}
-
-	public handleChangeCommentType = () => {
-		const isResidualRiskInputActive = !this.state.isResidualRiskInputActive;
-
-		this.setState({ isResidualRiskInputActive });
-	}
+	public state = {
+			isPinActive: false,
+			newScreenshot: '',
+			isResidualRiskInputActive: this.props.showResidualRiskInput
+	};
 
 	public renderScreenshotButton = renderWhenTrue(() => (
 		<TooltipButton
@@ -222,17 +184,13 @@ export class NewCommentForm extends React.PureComponent<IProps, IState> {
 		}
 	}
 
-	public componentWillUnmount() {
-		this.props.viewer.setPinDropMode(false);
-		this.props.setDisabled(false);
-	}
-
 	public handleSave = (values, form) => {
 		const screenshot = values.screenshot.substring(values.screenshot.indexOf(',') + 1);
 		const commentValues = { ...values, screenshot };
-		this.props.onSave(commentValues);
+		this.props.onSave(commentValues, () => {
+			form.resetForm();
+		});
 		this.setState({ newScreenshot: ''});
-		form.resetForm();
 	}
 
 	public handleNewScreenshot = () => {
@@ -248,6 +206,11 @@ export class NewCommentForm extends React.PureComponent<IProps, IState> {
 		const isResidualRiskInputActive = !this.state.isResidualRiskInputActive;
 
 		this.setState({ isResidualRiskInputActive });
+	}
+
+	public componentWillUnmount() {
+		this.props.viewer.setPinDropMode(false);
+		this.props.setDisabled(false);
 	}
 
 	public render() {

@@ -15,9 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { values } from 'lodash';
-import { all, put, select, takeEvery, takeLatest } from 'redux-saga/effects';
-import { dispatch, getState, getAngularService } from '../../helpers/migration';
+import { all, put, select, takeLatest } from 'redux-saga/effects';
 import { calculateTotalMeshes } from '../../helpers/tree';
 
 import { CHAT_CHANNELS } from '../../constants/chat';
@@ -32,19 +30,18 @@ import { ChatActions } from '../chat';
 import { selectCurrentUser } from '../currentUser';
 import { DialogActions } from '../dialog';
 import { SnackbarActions } from '../snackbar';
-import { getSelectMeshesByNodes, getSelectNodesByIds, getSelectNodesIdsFromSharedIds, TreeActions } from '../tree';
+import { TreeActions } from '../tree';
 import { GroupsActions, GroupsTypes, INITIAL_CRITERIA_FIELD_STATE } from './groups.redux';
 import {
 	selectActiveGroupDetails,
+	selectActiveGroupId,
 	selectColorOverrides,
 	selectFilteredGroups,
 	selectGroups,
 	selectGroupsMap,
-	selectIsAllOverrided,
 	selectNewGroupDetails,
 	selectSelectedFilters,
-	selectShowDetails,
-	selectActiveGroupId
+	selectShowDetails
 } from './groups.selectors';
 
 export function* fetchGroups({teamspace, modelId, revision}) {
@@ -347,34 +344,34 @@ export function* setNewGroup() {
 
 const onUpdated = (updatedGroup) => {
 	const group = prepareGroup(updatedGroup);
-	const state = getState();
+	const state = getState();  // TODO: migrate
 	const isShowingDetails = selectShowDetails(state);
 	const activeGroupId = selectActiveGroupId(state);
 
 	if (isShowingDetails && activeGroupId === group._id) {
-		dispatch(GroupsActions.showUpdateInfo());
+		dispatch(GroupsActions.showUpdateInfo());  // TODO: migrate
 
 		setTimeout(() => {
-			dispatch(GroupsActions.updateGroupSuccess(group));
+			dispatch(GroupsActions.updateGroupSuccess(group));  // TODO: migrate
 		}, 5000);
 	} else {
-		dispatch(GroupsActions.updateGroupSuccess(group));
+		dispatch(GroupsActions.updateGroupSuccess(group));  // TODO: migrate
 	}
 };
 
 const onCreated = (createdGroup) => {
-	dispatch(GroupsActions.updateGroupSuccess(prepareGroup(createdGroup)));
+	dispatch(GroupsActions.updateGroupSuccess(prepareGroup(createdGroup)));  // TODO: migrate
 };
 
 const onDeleted = (deletedGroupIds) => {
-	dispatch(GroupsActions.showDeleteInfo(deletedGroupIds));
+	dispatch(GroupsActions.showDeleteInfo(deletedGroupIds));  // TODO: migrate
 
 	setTimeout(() => {
-		dispatch(GroupsActions.setComponentState({
+		dispatch(GroupsActions.setComponentState({  // TODO: migrate
 			showDetails: false,
 			activeGroup: null
 		}));
-		dispatch(GroupsActions.deleteGroupsSuccess(deletedGroupIds));
+		dispatch(GroupsActions.deleteGroupsSuccess(deletedGroupIds));  // TODO: migrate
 	}, 5000);
 };
 
