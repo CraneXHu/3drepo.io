@@ -18,7 +18,13 @@
 import { Form } from 'formik';
 import styled from 'styled-components';
 
-import { ExpansionPanel, ExpansionPanelDetails, ExpansionPanelSummary, IconButton } from '@material-ui/core';
+import {
+	ExpansionPanel,
+	ExpansionPanelDetails,
+	ExpansionPanelSummary,
+	IconButton,
+	Typography as TypographyComponent
+} from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import { COLOR } from './../../../../styles/colors';

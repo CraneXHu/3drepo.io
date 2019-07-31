@@ -33,7 +33,7 @@ import {
 	selectIsAllOverridden,
 	selectIsPending,
 	selectSearchEnabled,
-	selectSelectedFilters
+	selectSelectedFilters,
 	selectShowDetails,
 	GroupsActions
 } from './../../../../modules/groups';

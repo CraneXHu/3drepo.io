@@ -30,6 +30,7 @@ import {
 	selectSelectedFilters,
 	selectSelectionMap,
 	selectVisibilityMap,
+	selectVisibleTreeNodesIds,
 	selectVisibleTreeNodesList,
 	TreeActions
 } from '../../../../modules/tree';

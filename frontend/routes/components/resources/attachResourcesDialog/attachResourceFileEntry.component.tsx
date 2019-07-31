@@ -22,7 +22,7 @@ import * as React from 'react';
 import {
 	FieldsRow,
 	StyledFormControl
-} from '../../../viewer/components/risks/components/riskDetails/riskDetails.styles';
+} from '../../../viewerGui/components/risks/components/riskDetails/riskDetails.styles';
 import { RemoveButton } from '../resources.component';
 import {  ResourceListItem } from './attachResourcesDialog.styles';
 
@@ -46,7 +46,7 @@ export const FileEntry = ({onClickRemove, index, entry}) => {
 				<Field type="hidden" name={fileFieldName} />
 				<ResourceListItem>
 					<span> {entry.file.name} </span>
-					<RemoveButton onClick={onClickRemove} />
+					<RemoveButton onClick={onClickRemove}/>
 				</ResourceListItem>
 			</StyledFormControl>
 		</FieldsRow>

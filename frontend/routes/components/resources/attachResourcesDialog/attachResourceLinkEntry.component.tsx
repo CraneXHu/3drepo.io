@@ -19,7 +19,7 @@ import { Field } from 'formik';
 import { get } from 'lodash';
 import * as React from 'react';
 import { FieldsRow,
-	StyledFormControl } from '../../../viewer/components/risks/components/riskDetails/riskDetails.styles';
+	StyledFormControl } from '../../../viewerGui/components/risks/components/riskDetails/riskDetails.styles';
 import { RemoveButton } from '../resources.component';
 import { ResourceListLinkItem } from './attachResourcesDialog.styles';
 

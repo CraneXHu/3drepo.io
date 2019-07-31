@@ -19,8 +19,9 @@ import * as React from 'react';
 import * as Yup from 'yup';
 import { clientConfigService } from '../../../../services/clientConfig';
 import {
-		DialogTab, DialogTabs
-		} from '../../topMenu/components/visualSettingsDialog/visualSettingsDialog.styles';
+	DialogTab,
+	DialogTabs
+} from '../../topMenu/components/visualSettingsDialog/visualSettingsDialog.styles';
 import { AttachResourceFiles } from './attachResourceFiles.component';
 import { Container } from './attachResourcesDialog.styles';
 import { DialogButtons } from './attachResourcesDialogButtons';

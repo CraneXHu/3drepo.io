@@ -18,7 +18,10 @@
 import { LinearProgress } from '@material-ui/core';
 import * as React from 'react';
 import { LabelButton } from '../../viewer/components/labelButton/labelButton.styles';
-import { FieldsRow, StyledFormControl } from '../../viewer/components/risks/components/riskDetails/riskDetails.styles';
+import {
+	FieldsRow,
+	StyledFormControl
+} from '../../viewerGui/components/risks/components/riskDetails/riskDetails.styles';
 import { FieldLabel } from '../textField/textField.styles';
 import AttachResourcesDialog from './attachResourcesDialog/attachResourcesDialog.container';
 import { ActionContainer, DocumentIcon,

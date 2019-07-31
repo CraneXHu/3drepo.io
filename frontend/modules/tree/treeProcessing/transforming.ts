@@ -1,6 +1,7 @@
-import { IS_DEVELOPMENT } from '../../../../constants/environment';
-import { BACKEND_VISIBILITY_STATES, SELECTION_STATES, VISIBILITY_STATES } from '../../../../constants/tree';
+import { IS_DEVELOPMENT } from '../../../constants/environment';
+import { BACKEND_VISIBILITY_STATES, SELECTION_STATES, VISIBILITY_STATES, NODE_TYPES } from '../../../constants/tree';
 import { INode } from '../treeProcessing.constants';
+import { DEFAULT_NODE_NAME } from './treeProcessing.constants';
 
 const isModelNode = (level, isFederation, hasFederationAsParent?) => {
 	return (level === 1 && !isFederation) || (level === 2 && hasFederationAsParent);
