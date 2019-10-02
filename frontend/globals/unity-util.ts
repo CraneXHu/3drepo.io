@@ -1091,6 +1091,15 @@ export class UnityUtil {
 	}
 
 	/**
+	 * Set Clip sectioning Border width
+	 * @category Configurations
+	 * @param width - width of the border shown when geometry intersects with the clipping plane
+	 */
+	public static setClipBorderWidth(width: float) {
+		UnityUtil.toUnity('ClipPlaneSectionWidth', UnityUtil.LoadingState.VIEWER_READY, width);
+	}
+
+	/**
 	 * Set the default near plane value. This can be use to tweak situations where
 	 * geometry closest to you are being clipped
 	 * @category Configurations
