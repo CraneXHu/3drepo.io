@@ -48,6 +48,7 @@ export class ViewerCanvas extends React.PureComponent<IProps, any> {
 	public componentDidMount() {
 		const { viewer } = this.props;
 		viewer.setupInstance(this.containerRef.current);
+		viewer.init();
 	}
 
 	public renderPins(prev, curr) {

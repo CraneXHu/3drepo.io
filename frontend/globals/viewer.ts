@@ -253,6 +253,7 @@ export class Viewer {
 
 			UnityUtil.onReady().then(() => {
 				this.initialized = true;
+				document.body.style.cursor = 'initial';
 				this.emit(Viewer.EVENT.UNITY_READY, {
 					model: this.modelString,
 					name: this.name

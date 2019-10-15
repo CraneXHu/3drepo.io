@@ -87,8 +87,6 @@ export class ViewerGui extends React.PureComponent<IProps, IState> {
 	public componentDidMount() {
 		const { queryParams: { issueId, riskId }, match: { params }, viewer } = this.props;
 
-		viewer.init();
-
 		if (issueId || !riskId) {
 			this.props.setPanelVisibility(VIEWER_PANELS.ISSUES, true);
 		}
