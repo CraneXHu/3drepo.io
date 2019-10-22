@@ -15,11 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import styled from 'styled-components';
 import Avatar from '@material-ui/core/Avatar';
+import styled from 'styled-components';
 
-import { COLOR } from '../../../styles';
 import Icon from '@material-ui/core/Icon';
+import { COLOR } from '../../../styles';
 
 const DEFAULT_SIZE = 50;
 const DEFAULT_FONT_SIZE = 20;
@@ -59,5 +59,6 @@ export const AvatarPlaceholder = styled(StyledAvatar)`
 		z-index: 1;
 		height: calc(100% + 2px);
 		width: calc(100% + 1px);
+		text-align: center;
 	}
 `;

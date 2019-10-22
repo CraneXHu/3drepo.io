@@ -15,10 +15,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from 'react';
 import { memoize } from 'lodash';
+import React from 'react';
 
-import { Container, AvatarPlaceholder, StyledAvatar, StyledIcon } from './avatar.styles';
+import Person from '@material-ui/icons/Person';
+import { AvatarPlaceholder, Container, StyledAvatar, StyledIcon } from './avatar.styles';
 
 interface IProps {
 	name: string;
@@ -53,7 +54,9 @@ export class Avatar extends React.PureComponent<IProps, IState> {
 
 	public renderPlaceholder = () => (
 		<AvatarPlaceholder>
-			<StyledIcon>person</StyledIcon>
+			<StyledIcon>
+				<Person />
+			</StyledIcon>
 		</AvatarPlaceholder>
 	)
 

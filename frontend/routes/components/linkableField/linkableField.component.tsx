@@ -15,10 +15,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as React from 'react';
+import React from 'react';
 
 interface IProps {
-	children: string;
+	children?: any;
 	className?: string;
 }
 
@@ -31,7 +31,7 @@ const anchorUrl = (url, key) => {
 
 export class LinkableField extends React.PureComponent<IProps, null> {
 	public linkedText = (): React.ReactNode => {
-		let match = urlRegex.exec(this.props.children);
+		let match = urlRegex.exec(this.props.children || '');
 		let lastIndex = 0;
 		const res = [];
 

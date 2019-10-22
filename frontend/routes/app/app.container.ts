@@ -15,24 +15,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { createStructuredSelector } from 'reselect';
-import { withRouter } from 'react-router';
-import { connect, addRouting } from '../../helpers/migration';
 
-import { App } from './app.component';
-import { AuthActions, selectIsAuthenticated, selectActiveSession } from '../../modules/auth';
+import { selectActiveSession, selectIsAuthenticated, selectIsPending, AuthActions } from '../../modules/auth';
 import { selectCurrentUser } from '../../modules/currentUser';
+import { DialogActions } from '../../modules/dialog/dialog.redux';
+import { StartupActions } from '../../modules/startup/startup.redux';
+import { App } from './app.component';
 
 const mapStateToProps = createStructuredSelector({
 	isAuthenticated: selectIsAuthenticated,
 	hasActiveSession: selectActiveSession,
+	isAuthPending: selectIsPending,
 	currentUser: selectCurrentUser
 });
 
 export const mapDispatchToProps = (dispatch) => bindActionCreators({
 	authenticate: AuthActions.authenticate,
-	logout: AuthActions.logout
+	logout: AuthActions.logout,
+	startup: StartupActions.startup,
+	showNewUpdateDialog: DialogActions.showNewUpdateDialog
 }, dispatch);
 
-export default addRouting(withRouter(connect(mapStateToProps, mapDispatchToProps)(App)));
+export default connect(mapStateToProps, mapDispatchToProps)(App);
