@@ -1095,7 +1095,7 @@ export class UnityUtil {
 	 * @category Configurations
 	 * @param width - width of the border shown when geometry intersects with the clipping plane
 	 */
-	public static setClipBorderWidth(width: float) {
+	public static setClipBorderWidth(width: number) {
 		UnityUtil.toUnity('ClipPlaneSectionWidth', UnityUtil.LoadingState.VIEWER_READY, width);
 	}
 
