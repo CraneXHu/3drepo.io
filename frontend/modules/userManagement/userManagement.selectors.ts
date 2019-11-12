@@ -79,3 +79,7 @@ export const selectIsTeamspaceAdmin = createSelector(
 export const selectCollaboratorLimit = createSelector(
 	selectUserManagementDomain, (state) => state.collaboratorLimit
 );
+
+export const selectUserNotExists = createSelector(
+	selectUserManagementDomain, (state) => state.userNotExists
+);
