@@ -29,6 +29,7 @@ import {
 } from '../../modules/userManagement';
 import { Users } from './users.component';
 
+import { DialogActions } from '../../modules/dialog';
 import { selectJobs } from '../../modules/jobs';
 import { TeamspacesActions } from '../../modules/teamspaces';
 
@@ -48,6 +49,7 @@ export const mapDispatchToProps = (dispatch) => bindActionCreators({
 	onUsersSearch: UserManagementActions.getUsersSuggestions,
 	clearUsersSuggestions: UserManagementActions.clearUsersSuggestions,
 	fetchQuotaInfo: TeamspacesActions.fetchQuotaInfo,
+	showDialog: DialogActions.showDialog,
 }, dispatch);
 
 export default withRouter(

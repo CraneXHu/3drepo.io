@@ -37,6 +37,7 @@ import {
 	TableButton
 } from '../components/customTable/customTable.component';
 import { FloatingActionPanel } from '../components/floatingActionPanel/floatingActionPanel.component';
+import { InvitationsDialog } from '../components/invitationsDialog/invitationsDialog.component';
 import { JobItem } from '../components/jobItem/jobItem.component';
 import { NewUserForm } from '../components/newUserForm/newUserForm.component';
 import { UserItem } from '../components/userItem/userItem.component';
@@ -85,6 +86,7 @@ interface IProps {
 	updatePermissions: (permissions) => void;
 	onUsersSearch: (searchText) => void;
 	clearUsersSuggestions: () => void;
+	showDialog: (config) => void;
 }
 
 interface IState {
@@ -223,6 +225,14 @@ export class Users extends React.PureComponent<IProps, IState> {
 		}
 	}
 
+	public handleInvitationOpen = (email, job) => {
+		this.props.showDialog({
+			title: 'Invite user',
+			template: InvitationsDialog,
+			data: { email, job }
+		});
+	}
+
 	public renderNewUserFormPanel = ({ closePanel }) => {
 		const { limit } = this.state;
 		const { users, usersSuggestions, clearUsersSuggestions, onUsersSearch } = this.props;
@@ -234,7 +244,8 @@ export class Users extends React.PureComponent<IProps, IState> {
 			users: usersSuggestions,
 			onSave: this.onSave,
 			clearSuggestions: clearUsersSuggestions,
-			getUsersSuggestions: onUsersSearch
+			getUsersSuggestions: onUsersSearch,
+			onInvitationOpen: this.handleInvitationOpen
 		};
 		return <NewUserForm {...formProps} onCancel={closePanel} />;
 	}
