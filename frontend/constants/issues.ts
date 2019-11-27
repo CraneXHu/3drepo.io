@@ -10,7 +10,7 @@ import { SortAmountDown, SortAmountUp } from '../routes/components/fontAwesomeIc
 
 import ViewModule from '@material-ui/icons/ViewModule';
 
-import { DATA_TYPES } from '../routes/components/filterPanel/filterPanel.component';
+import { DATA_TYPES, FILTER_TYPES } from '../routes/components/filterPanel/filterPanel.component';
 import { COLOR, PIN_COLORS } from '../styles';
 
 export const ISSUE_PANEL_NAME = 'issue';
@@ -94,32 +94,32 @@ export const ISSUE_FILTERS = [
 	{
 		label: 'Status',
 		relatedField: ISSUE_FILTER_RELATED_FIELDS.STATUS,
-		type: DATA_TYPES.UNDEFINED
+		type: FILTER_TYPES.UNDEFINED
 	},
 	{
 		label: 'Priority',
 		relatedField: ISSUE_FILTER_RELATED_FIELDS.PRIORITY,
-		type: DATA_TYPES.UNDEFINED
+		type: FILTER_TYPES.UNDEFINED
 	},
 	{
 		label: 'Type',
 		relatedField: ISSUE_FILTER_RELATED_FIELDS.TYPE,
-		type: DATA_TYPES.UNDEFINED
+		type: FILTER_TYPES.UNDEFINED
 	},
 	{
 		label: 'Created by',
 		relatedField: ISSUE_FILTER_RELATED_FIELDS.CREATED_BY,
-		type: DATA_TYPES.UNDEFINED
+		type: FILTER_TYPES.UNDEFINED
 	},
 	{
 		label: 'Assigned to',
 		relatedField: ISSUE_FILTER_RELATED_FIELDS.ASSIGNED_TO,
-		type: DATA_TYPES.UNDEFINED
+		type: FILTER_TYPES.UNDEFINED
 	},
 	{
 		label: 'Date',
 		relatedField: ISSUE_FILTER_RELATED_FIELDS.CREATED_DATE,
-		type: DATA_TYPES.DATE
+		type: FILTER_TYPES.DATE
 	}
 ] as any;
 
@@ -146,19 +146,23 @@ export const ISSUES_ACTIONS_MENU = {
 	},
 	SORT_BY_DATE: {
 		label: 'Sort by date',
-		type: ACTIONS_TYPES.SORT,
+		isSorting: true,
 		Icon: {
 			ASC: SortAmountUp,
 			DESC: SortAmountDown
 		}
 	},
 	SHOW_PINS: {
-		label:  'Show Pins',
+		label: 'Show Pins',
 		Icon: Pins,
-		enabled:  true
+		enabled: true
 	},
 	SHOW_SUBMODEL_ISSUES: {
 		label: 'Show sub model issues',
+		Icon: ViewModule
+	},
+	SHOW_CLOSED_ISSUES: {
+		label: 'Show closed issues',
 		Icon: ViewModule
 	}
 };

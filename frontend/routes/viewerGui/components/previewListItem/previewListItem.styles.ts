@@ -19,9 +19,22 @@ import Button from '@material-ui/core/Button';
 import MenuItem from '@material-ui/core/MenuItem';
 import Typography from '@material-ui/core/Typography';
 import ArrowIcon from '@material-ui/icons/ArrowForward';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { COLOR } from '../../../../styles/colors';
+import OpenInViewerButtonComponent from '../../../components/openInViewerButton/openInViewerButton.container';
+
+export const OpenInViewerButton = styled(OpenInViewerButtonComponent)`
+	&& {
+		display: none;
+		top: -6px;
+		right: -3px;
+
+		&:hover {
+			display: block;
+		}
+	}
+`;
 
 export const MenuItemContainer = styled(MenuItem)`
 	position: relative;
@@ -34,6 +47,10 @@ export const MenuItemContainer = styled(MenuItem)`
 
 		&:hover {
 			background-color: ${(props: any) => props.expired ? COLOR.WARNING : COLOR.GRAY};
+
+			${OpenInViewerButton} {
+				display: block;
+			}
 		}
 	}
 ` as any;
@@ -80,8 +97,8 @@ export const Container = styled.div`
 	box-sizing: border-box;padding: 7px 40px 7px 7px;position: relative;
 `;
 
-export const Thumbnail = styled.img`
-	background-color: ${COLOR.GRAY};
+const ThumbnailStyles = css`
+	background-color: ${COLOR.BLACK_6};
 	display: block;
 	margin-right: 7px;
 	height: 100%;
@@ -89,13 +106,27 @@ export const Thumbnail = styled.img`
 	max-width: 100%;
 `;
 
+export const Thumbnail = styled.img`
+	${ThumbnailStyles};
+`;
+
+export const ThumbnailPlaceholder = styled.div`
+	${ThumbnailStyles};
+
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: ${COLOR.BLACK_30};
+`;
+
 export const ThumbnailWrapper = styled.div`
-	width: auto;
+	width: 80px;
 `;
 
 export const Content = styled.div`
 	min-width: 0;
 	flex: 1;
+	margin-left: 8px;
 `;
 
 export const Description = styled.div`
@@ -103,6 +134,7 @@ export const Description = styled.div`
 	line-height: 1.25;
 	margin-top: 3px;
 	color: ${COLOR.BLACK_60};
+	white-space: normal;
 `;
 
 export const RoleIndicator = styled.div`

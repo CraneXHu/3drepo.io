@@ -4,6 +4,7 @@ import { combineReducers } from 'redux';
 import { reducer as authReducer } from './auth/auth.redux';
 import { reducer as billingReducer } from './billing/billing.redux';
 import { reducer as bimReducer } from './bim/bim.redux';
+import { reducer as boardReducer } from './board/board.redux';
 import { reducer as chatReducer } from './chat/chat.redux';
 import { reducer as compareReducer } from './compare/compare.redux';
 import { reducer as currentUserReducer } from './currentUser/currentUser.redux';
@@ -17,7 +18,7 @@ import { reducer as modelReducer } from './model/model.redux';
 import { reducer as notificationsReducer } from './notifications/notifications.redux';
 import { reducer as risksReducer } from './risks/risks.redux';
 import { reducer as snackbarReducer } from './snackbar/snackbar.redux';
-import { reducer as starredMetaReducer } from './starredMeta/starredMeta.redux';
+import { reducer as starredReducer } from './starred/starred.redux';
 import { reducer as teamspacesReducer } from './teamspaces/teamspaces.redux';
 import { reducer as treeReducer } from './tree/tree.redux';
 import { reducer as userManagementReducer } from './userManagement/userManagement.redux';
@@ -48,11 +49,12 @@ export default function createReducer(history) {
 		groups: groupsReducer,
 		tree: treeReducer,
 		bim: bimReducer,
-		starredMeta: starredMetaReducer,
+		starred: starredReducer,
 		measure: measureReducer,
 		issues: issuesReducer,
 		compare: compareReducer,
 		chat: chatReducer,
-		viewerGui: viewerGuiReducer// <-- INJECT MODULE REDUCER -->
+		viewerGui: viewerGuiReducer,
+		board: boardReducer // <-- INJECT MODULE REDUCER -->
 	});
 }

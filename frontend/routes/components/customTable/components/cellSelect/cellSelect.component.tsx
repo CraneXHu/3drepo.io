@@ -63,9 +63,11 @@ export class CellSelect extends React.PureComponent<IProps, IState> {
 
 	public renderOptions = (items, TemplateComponent) => {
 		const labelName =  this.props.labelName || 'name';
+
 		return items.map((item, index) => {
 			return (
 				<Item
+					group={item.group}
 					disabled={item.disabled}
 					key={index}
 					value={item.value}

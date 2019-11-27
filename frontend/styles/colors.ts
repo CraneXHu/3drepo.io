@@ -4,13 +4,15 @@ import { hexToGLColor, hexToRgba } from '../helpers/colors';
 
 export const BLACK = '#00000';
 export const WHITE = '#ffffff';
-const PRIMARY_MAIN = '#0c2f54';
+export const PRIMARY_MAIN = '#0c2f54';
+export const SECONDARY_MAIN = '#06563c';
 
 export const COLOR = {
 	PRIMARY_MAIN,
 	PRIMARY_LIGHT: '#3c5876',
 	PRIMARY_DARK: '#08203a',
 	SECONDARY_MAIN: '#06563c',
+	SECONDARY_MAIN_54: hexToRgba(SECONDARY_MAIN, .54),
 	SECONDARY_LIGHT: '#377763',
 	SECONDARY_DARK: '#043827',
 	PRIMARY_MAIN_80: hexToRgba(PRIMARY_MAIN, .8),
@@ -32,6 +34,7 @@ export const COLOR = {
 	BLACK_50: hexToRgba(BLACK, .5),
 	BLACK_54: hexToRgba(BLACK, .54),
 	BLACK_60: hexToRgba(BLACK, .6),
+	BLACK_70: hexToRgba(BLACK, .7),
 	BLACK_80: hexToRgba(BLACK, .8),
 	BLACK_87: hexToRgba(BLACK, .87),
 
@@ -40,6 +43,7 @@ export const COLOR = {
 	GRAY_60: 'rgba(189, 189, 189, .6)',
 	GRAY_50: 'rgba(189, 189, 189, .5)',
 	LIGHT_GRAY: '#fafafa',
+	LIGHT_GRAY_89: 'rgba(250, 250, 250, .89)',
 	WARNING_LIGHT: '#ffefef',
 	WARNING: '#ffd5d5',
 	VIVID_NAVY: '#3452ff',
@@ -77,7 +81,9 @@ export const COLOR = {
 	REGENT_GRAY: '#8397AC',
 	SILVER_CHALICE: '#A8A8A8',
 	LIGHT_BLUE: '#6788ab',
-	CLOUD: '#cfcdcc'
+	ALICE_BLUE: '#f0f7ff',
+	CLOUD: '#cfcdcc',
+	TUNDORA: '#4d4d4d'
 };
 
 export const PIN_COLORS = mapValues(COLOR, hexToGLColor);
