@@ -125,7 +125,7 @@ export class Dashboard extends React.PureComponent<IProps, any> {
 				alignContent="flex-start"
 			>
 				<Sidebar>
-					<UserInfo
+					<UserInfo id="sidebarUserInfo"
 						{...currentUser}
 						loading={!isInitialised && (isPending || isAvatarPending)}
 						items={MENU_ITEMS}

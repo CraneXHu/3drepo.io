@@ -35,6 +35,7 @@ interface IProps {
 	username: string;
 	email: string;
 	avatarUrl: string;
+	id?: string;
 }
 
 const renderItems = (items) => items.map((item) => (
@@ -46,10 +47,10 @@ const renderItems = (items) => items.map((item) => (
 ));
 
 const UserInfoComponent = (props: IProps) => {
-	const { items, loading, firstName, lastName, username, email, avatarUrl } = props;
+	const { items, loading, firstName, lastName, username, email, avatarUrl, id } = props;
 	const name = firstName || lastName ? `${firstName || ''} ${lastName || ''}`.trim() : username;
 	return (
-		<Container>
+		<Container id={id}>
 			<Panel title="Teamspaces">
 					<StyledList>
 						<UserContainer>
