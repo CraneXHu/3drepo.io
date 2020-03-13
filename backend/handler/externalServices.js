@@ -61,6 +61,8 @@ ExternalServices.storeFile = (account, collection, data) => {
 	switch(type) {
 		case "fs":
 			return FSHandler.storeFile(data);
+		case "s3" :
+			return S3Handler.storeFile(data);
 		case "gridfs":
 			return GridFSHandler.storeFile(account, collection, data);
 		default:

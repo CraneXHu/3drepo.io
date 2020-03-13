@@ -20,17 +20,19 @@
 const config = require("../config.js");
 const responseCodes = require("../response_codes.js");
 const systemLogger = require("../logger.js").systemLogger;
-const AWS = {}; // require("aws-sdk"); - uncomment and add aws-sdk to package.json to revive.
+const AWS =  require("aws-sdk/clients/s3"); // - uncomment and add aws-sdk to package.json to revive.
 const https = require("https");
+const nodeuuid = require("uuid/v1");
+const farmhash = require("farmhash");
 
 class S3Handler {
 	constructor() {
 		if(AWS.config) {
-			if (config.s3 &&
-				config.s3.accessKey &&
-				config.s3.secretKey &&
-				config.s3.bucketName &&
-				config.s3.region) {
+			if (config.s3) {
+				// config.s3.accessKey &&
+				// config.s3.secretKey &&
+				// config.s3.bucketName &&
+				// config.s3.region
 				const agent = new https.Agent({
 					maxSockets: 1000
 				});
@@ -43,7 +45,19 @@ class S3Handler {
 						agent: agent
 					}
 				});
-				this.s3Conn = new AWS.S3();
+				if (config.s3.alluxio) {
+					const alluxioconf = {
+						accessKeyId: "",
+						secretAccessKey: "",
+						endpoint: "http://localhost:39999/api/v1/s3",
+						sslEnabled: false,
+						s3ForcePathStyle: true
+					};
+					AWS.config.update(alluxioconf);
+					this.s3Conn = new AWS.S3();
+				} else {
+					this.s3Conn = new AWS.S3();
+				}
 				this.testConnection();
 			} else {
 				systemLogger.logError("S3 is not configured.");
@@ -64,6 +78,21 @@ class S3Handler {
 			Promise.reject(responseCodes.UNSUPPORTED_STORAGE_TYPE);
 	}
 
+	storeFile(data) {
+		const _id = nodeuuid();
+		// const folderNames = generateFoldernames(_id, config.fs.levels);
+		const link = _id;
+		return new Promise((resolve, reject) => {
+			this.s3Conn.putObject({Bucket : config.s3.bucketName, Key: _id, Body: data}),(err=> {
+				if (err) {
+					reject(err);
+				} else {
+					resolve({_id, link, size:data.length, type: "s3"});
+				}
+			});
+		});
+	}
+
 	removeFiles(keys) {
 		const delList = keys.map((item) => {
 			return { Key: item};
@@ -79,6 +108,8 @@ class S3Handler {
 			if(err) {
 				systemLogger.logError("failed to connect to S3: ", err);
 				throw new Error("S3 connection failed");
+			} else {
+				systemLogger.logError("connected to s3: ");
 			}
 		});
 	}
