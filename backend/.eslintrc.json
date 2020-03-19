@@ -18,6 +18,7 @@
   },
   "plugins": ["node"],
   "extends": ["eslint:recommended", "plugin:node/recommended"],
+  "ignorePatterns": ["node_modules/"],
   "rules": {
 	"node/no-unpublished-require": 0,
 	"no-fallthrough" : 0,
