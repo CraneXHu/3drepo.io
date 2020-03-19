@@ -20,77 +20,79 @@
 const config = require("../config.js");
 const responseCodes = require("../response_codes.js");
 const systemLogger = require("../logger.js").systemLogger;
-const AWS =  require("aws-sdk/clients/s3"); // - uncomment and add aws-sdk to package.json to revive.
+const AWS =  require("aws-sdk");
 const https = require("https");
 const nodeuuid = require("uuid/v1");
-const farmhash = require("farmhash");
 
 class S3Handler {
 	constructor() {
-		if(AWS.config) {
+		if (AWS.config) {
 			if (config.s3) {
-				// config.s3.accessKey &&
-				// config.s3.secretKey &&
-				// config.s3.bucketName &&
-				// config.s3.region
 				const agent = new https.Agent({
 					maxSockets: 1000
 				});
-
-				AWS.config.update({
-					accessKeyId: config.s3.accessKey,
-					secretAccessKey: config.s3.secretKey,
-					region: config.s3.region,
-					httpOptions:{
-						agent: agent
-					}
-				});
+				
 				if (config.s3.alluxio) {
-					const alluxioconf = {
-						accessKeyId: "",
-						secretAccessKey: "",
-						endpoint: "http://localhost:39999/api/v1/s3",
-						sslEnabled: false,
-						s3ForcePathStyle: true
-					};
-					AWS.config.update(alluxioconf);
+						if (config.s3.endpoint) {
+								AWS.config.update({
+									accessKeyId: '',
+									secretAccessKey: '',
+									region: '',
+									endpoint: config.s3.endpoint,
+									sslEnabled: false,
+									s3ForcePathStyle: true,
+								});
+						} else {
+							systemLogger.logError("S3 is missing required endpoint config.");
+							throw new Error("S3 is not configured");
+						}
+					} else {
+						if (config.s3.accessKey &&
+							config.s3.secretKey &&
+							config.s3.bucketName &&
+							config.s3.region) {
+								AWS.config.update({
+									accessKeyId: config.s3.accessKey,
+									secretAccessKey: config.s3.secretKey,
+									region: config.s3.region,
+									httpOptions:{
+										agent: agent
+										}
+									});
+						} else {
+							systemLogger.logError("S3 is missing required config.");
+							throw new Error("S3 is not configured");					
+						}
+					}
 					this.s3Conn = new AWS.S3();
-				} else {
-					this.s3Conn = new AWS.S3();
-				}
-				this.testConnection();
+					this.testConnection();
 			} else {
 				systemLogger.logError("S3 is not configured.");
 				throw new Error("S3 is not configured");
 			}
-		}
+		};
 	}
 
 	getFileStream(key) {
+		systemLogger.logInfo("s3: getFileStream: key:" + key);
 		return this.s3Conn ?
 			this.s3Conn.getObject({Bucket : config.s3.bucketName, Key: key}).createReadStream() :
 			Promise.reject(responseCodes.UNSUPPORTED_STORAGE_TYPE);
 	}
 
 	getFile(key) {
+		systemLogger.logInfo("s3: getFile: key:" + key);
 		return this.s3Conn ?
-			this.s3Conn.getObject({Bucket : config.s3.bucketName, Key: key}).promise().then((file) => file.body) :
+			this.s3Conn.getObject({Bucket : config.s3.bucketName, Key: key}).promise().then((file) => file.Body) :
 			Promise.reject(responseCodes.UNSUPPORTED_STORAGE_TYPE);
 	}
 
 	storeFile(data) {
 		const _id = nodeuuid();
-		// const folderNames = generateFoldernames(_id, config.fs.levels);
-		const link = _id;
-		return new Promise((resolve, reject) => {
-			this.s3Conn.putObject({Bucket : config.s3.bucketName, Key: _id, Body: data}),(err=> {
-				if (err) {
-					reject(err);
-				} else {
-					resolve({_id, link, size:data.length, type: "s3"});
-				}
-			});
-		});
+		systemLogger.logInfo("s3: storeFile");
+		return this.s3Conn.putObject({Bucket: config.s3.bucketName, Key: _id, Body: data}).promise().then(() => (
+			{_id, link: _id, size: data.length, type: "s3"}
+		));
 	}
 
 	removeFiles(keys) {
@@ -99,7 +101,7 @@ class S3Handler {
 		});
 		const params = { Delete: {Objects: delList}, Bucket: config.s3.bucketName };
 		return this.s3Conn ?
-			this.s3Conn.deleteObjects(params).promise() :
+				this.s3Conn.deleteObjects(params) :
 			Promise.reject(responseCodes.UNSUPPORTED_STORAGE_TYPE);
 	}
 
@@ -109,7 +111,7 @@ class S3Handler {
 				systemLogger.logError("failed to connect to S3: ", err);
 				throw new Error("S3 connection failed");
 			} else {
-				systemLogger.logError("connected to s3: ");
+				systemLogger.logInfo("connected to s3: " + config.s3.bucketName);
 			}
 		});
 	}
