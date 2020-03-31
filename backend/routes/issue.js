@@ -345,11 +345,8 @@ router.get("/revision/:rid/issues.html", middlewares.issue.canView, renderIssues
  * @apiParam (Request body) {String} priority The priority of the issue. It can have a value of "none", "low", "medium" or "high".
  * @apiParam (Request body) {String} topic_type Type of the issue. It's value has to be one of the defined topic_types for the model. See <a href='#api-Model-createModel'>here</a> for more details.
  * @apiParam (Request body) {Viewpoint} viewpoint The viewpoint of the issue, defining the position of the camera and the screenshot for that position.
- * @apiParam (Request body) {String} owner The username of the user that created the issue
  * @apiParam (Request body) {String} desc The description of the created issue
- * @apiParam (Request body) {String} creator_role The job of the user that created the issue
  * @apiParam (Request body) {[3]Number} position The vector defining the pin of the issue. If the pin doesnt has an issue its an empty array.
- * @apiParam (Request body) {[3]Number} norm The normal vector for the pin of the issue. Its not actually being used right now it it ca alwasy be of value [0,0,0].
  *
  * @apiParam (Request body: Viewpoint) {[3]Number} right The right vector of the viewpoint indicating the direction of right in relative coordinates.
  * @apiParam (Request body: Viewpoint) {[3]Number} up The up vector of the viewpoint indicating the direction of up in relative coordinates.
@@ -410,19 +407,11 @@ router.get("/revision/:rid/issues.html", middlewares.issue.canView, renderIssues
  *       "hideIfc": true,
  *       "screenshot": "iVBORw0KGgoAAAANSUhEUgAACAAAA...ggg=="
  *    },
- *    "owner": "teamSpace1",
  *    "desc": "This is the most awesome issue ever",
- *    "creator_role": "jobA",
- *    "scale": 1,
  *    "position": [
  *       -3960.10205078125,
  *       4487.1552734375,
  *       3326.732177734375
- *    ],
- *    "norm": [
- *       0,
- *       0,
- *       0
  *    ]
  * }
  *
@@ -801,11 +790,14 @@ router.delete("/issues/:issueId/resources",middlewares.issue.canComment, detachR
 
 function storeIssue(req, res, next) {
 	const data = req.body;
-	data.owner = req.session.user.username;
-	data.sessionId = req.headers[C.HEADER_SOCKET_ID];
-	data.revId = req.params.rid;
+	const sessionId = req.headers[C.HEADER_SOCKET_ID];
 
-	Issue.createIssue({ account: req.params.account, model: req.params.model }, data).then(issue => {
+	data.owner = req.session.user.username;
+	data.revId = req.params.rid;
+	data.created = undefined;
+	const {account, model} = req.params;
+
+	Issue.create(account, model, data, sessionId).then(issue => {
 		req.dataModel = issue;
 		next();
 	}).catch(err => {
@@ -833,14 +825,12 @@ function updateIssue(req, res, next) {
 
 function listIssues(req, res, next) {
 	const place = utils.APIInfo(req);
-	const dbCol = { account: req.params.account, model: req.params.model, logger: req[C.REQ_REPO].logger };
-
-	const branch = req.params.rid ? null : "master";
-	const rid = req.params.rid ? req.params.rid : null;
+	const { account, model, rid } = req.params;
+	const branch = rid ? null : "master";
 	const ids = req.query.ids ? req.query.ids.split(",") : null;
 	const convertCoords = !!req.query.convertCoords;
 
-	Issue.getIssuesList(dbCol, req.session.user.username, branch, rid, ids, req.query.sortBy, convertCoords).then(issues => {
+	Issue.getIssuesList(account, model, branch, rid, ids, req.query.sortBy, convertCoords).then(issues => {
 		responseCodes.respond(place, req, res, next, responseCodes.OK, issues);
 	}).catch(err => {
 		responseCodes.respond(place, req, res, next, err.resCode || utils.mongoErrorToResCode(err), err.resCode ? {} : err);
@@ -905,12 +895,10 @@ function findIssueById(req, res, next) {
 
 function renderIssuesHTML(req, res, next) {
 	const place = utils.APIInfo(req);
-	const account = req.params.account;
-	const model = req.params.model;
-	const rid = req.params.rid;
+	const {account, model, rid} = req.params;
 	const ids = req.query.ids ? req.query.ids.split(",") : undefined;
 
-	Issue.getIssuesReport(account, model, req.session.user.username, rid, ids, res).catch(err => {
+	Issue.getIssuesReport(account, model, rid, ids, res).catch(err => {
 		responseCodes.respond(place, req, res, next, err.resCode || utils.mongoErrorToResCode(err), err.resCode ? {} : err);
 	});
 }
@@ -968,9 +956,9 @@ function importBCF(req, res, next) {
 
 function getScreenshot(req, res, next) {
 	const place = utils.APIInfo(req);
-	const dbCol = { account: req.params.account, model: req.params.model };
+	const {account, model, issueId, vid} = req.params;
 
-	Issue.getScreenshot(dbCol, req.params.issueId, req.params.vid).then(buffer => {
+	Issue.getScreenshot(account, model, issueId, vid).then(buffer => {
 		responseCodes.respond(place, req, res, next, responseCodes.OK, buffer, "png", config.cachePolicy);
 	}).catch(err => {
 		responseCodes.respond(place, req, res, next, err, err);
@@ -979,9 +967,9 @@ function getScreenshot(req, res, next) {
 
 function getScreenshotSmall(req, res, next) {
 	const place = utils.APIInfo(req);
-	const dbCol = { account: req.params.account, model: req.params.model };
+	const { account, model, issueId, vid } = req.params;
 
-	Issue.getSmallScreenshot(dbCol, req.params.issueId, req.params.vid).then(buffer => {
+	Issue.getSmallScreenshot(account, model, issueId, vid).then(buffer => {
 		responseCodes.respond(place, req, res, next, responseCodes.OK, buffer, "png", config.cachePolicy);
 	}).catch(err => {
 		responseCodes.respond(place, req, res, next, err, err);
@@ -990,9 +978,9 @@ function getScreenshotSmall(req, res, next) {
 
 function getThumbnail(req, res, next) {
 	const place = utils.APIInfo(req);
-	const dbCol = { account: req.params.account, model: req.params.model };
+	const { account, model, issueId } = req.params;
 
-	Issue.getThumbnail(dbCol, req.params.issueId).then(buffer => {
+	Issue.getThumbnail(account, model, issueId).then(buffer => {
 		responseCodes.respond(place, req, res, next, responseCodes.OK, buffer, "png", config.cachePolicy);
 	}).catch(err => {
 		responseCodes.respond(place, req, res, next, err, err);

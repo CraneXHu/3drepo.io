@@ -61,7 +61,7 @@ export const { Types: IssuesTypes, Creators: IssuesActions } = createActions({
 	attachLinkResources: ['links'],
 	attachResourcesSuccess: ['resources', 'issueId'],
 	updateResourcesSuccess: ['resourcesIds', 'updates', 'issueId' ],
-	resetComponentState: [],
+	reset: [],
 	goToIssue: ['issue'],
 	showMultipleGroups: ['issue', 'revision'],
 	setNewComment: ['newComment'],
@@ -199,9 +199,7 @@ const showCloseInfo = (state = INITIAL_STATE, { issueId }) => {
 	return { ...state, issuesMap };
 };
 
-const resetComponentState = (state = INITIAL_STATE) => {
-	return { ...state, componentState: INITIAL_STATE.componentState };
-};
+const reset = () => cloneDeep(INITIAL_STATE);
 
 const removeResourceSuccess =  (state = INITIAL_STATE, { resource, issueId }) => {
 	const resources = state.issuesMap[issueId].resources.filter((r) => r._id !== resource._id);
@@ -211,7 +209,7 @@ const removeResourceSuccess =  (state = INITIAL_STATE, { resource, issueId }) =>
 };
 
 const attachResourcesSuccess = (state = INITIAL_STATE, { resources, issueId }) => {
-	resources = resources.concat(state.issuesMap[issueId].resources);
+	resources = resources.concat(state.issuesMap[issueId].resources || []);
 	const issuesMap = updateIssueProps(state.issuesMap, issueId, { resources });
 	return { ...state, issuesMap};
 };
@@ -250,7 +248,7 @@ export const reducer = createReducer(INITIAL_STATE, {
 	[IssuesTypes.DELETE_COMMENT_SUCCESS]: deleteCommentSuccess,
 	[IssuesTypes.TOGGLE_SORT_ORDER]: toggleSortOrder,
 	[IssuesTypes.SHOW_CLOSE_INFO]: showCloseInfo,
-	[IssuesTypes.RESET_COMPONENT_STATE]: resetComponentState,
+	[IssuesTypes.RESET]: reset,
 	[IssuesTypes.REMOVE_RESOURCE_SUCCESS]: removeResourceSuccess,
 	[IssuesTypes.ATTACH_RESOURCES_SUCCESS]: attachResourcesSuccess,
 	[IssuesTypes.UPDATE_RESOURCES_SUCCESS]: updateResourcesSuccess,

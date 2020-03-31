@@ -22,14 +22,14 @@ import { hasPin, riskToPin } from '../../helpers/pins';
 import { searchByFilters } from '../../helpers/searching';
 import { selectQueryParams } from '../router/router.selectors';
 
-export const selectRisksDomain = (state) => ({...state.risks});
-
-export const selectRisks = createSelector(
-	selectRisksDomain, (state) => values(state.risksMap)
-);
+export const selectRisksDomain = (state) => state.risks;
 
 export const selectRisksMap = createSelector(
 	selectRisksDomain, (state) => state.risksMap
+);
+
+export const selectRisks = createSelector(
+	selectRisksMap, (risksMap) => values(risksMap)
 );
 
 export const selectComponentState = createSelector(
@@ -113,25 +113,27 @@ export const selectSelectedRisk = createSelector(
 );
 
 export const selectPins = createSelector(
-	selectFilteredRisks, selectComponentState, selectActiveRiskDetails, selectShowPins,
-	(risks: any, componentState, detailedRisk, showPins) => {
+	selectFilteredRisks, selectActiveRiskDetails,
+	selectShowPins, selectShowDetails, selectActiveRiskId,
+	(risks: any, detailedRisk, showPins, showDetails, activeRiskId) => {
 
-	let pinsToShow = [];
+		let pinsToShow = [];
 
-	if (showPins) {
-		pinsToShow = risks.reduce((pins, risk) => {
-			if (!hasPin(risk)) {
+		if (showPins) {
+			pinsToShow = risks.reduce((pins, risk) => {
+				if (!hasPin(risk)) {
+					return pins;
+				}
+
+				pins.push(riskToPin(risk, activeRiskId === risk._id ));
 				return pins;
-			}
+			} , []);
+		}
 
-			pins.push(riskToPin(risk, componentState.activeRisk === risk._id ));
-			return pins;
-		} , []);
+		if (showDetails && detailedRisk && hasPin(detailedRisk)) {
+			pinsToShow.push(riskToPin(detailedRisk, true));
+		}
+
+		return pinsToShow;
 	}
-
-	if (componentState.showDetails && detailedRisk && hasPin(detailedRisk)) {
-		pinsToShow.push(riskToPin(detailedRisk, true));
-	}
-
-	return pinsToShow;
-});
+);

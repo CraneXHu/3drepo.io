@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -23,7 +23,9 @@ import { selectCurrentUser } from '../../modules/currentUser';
 import { selectIsPending, selectSettings, ModelActions } from '../../modules/model';
 import { selectQueryParams } from '../../modules/router/router.selectors';
 import { TreeActions } from '../../modules/tree';
-import { selectIsFocusMode, selectVisiblePanels, ViewerGuiActions } from '../../modules/viewerGui';
+import {
+	selectIsFocusMode, selectLeftPanels, selectRightPanels, ViewerGuiActions,
+} from '../../modules/viewerGui';
 import { withViewer } from '../../services/viewer/viewer';
 import { ViewerGui } from './viewerGui.component';
 
@@ -32,7 +34,8 @@ const mapStateToProps = createStructuredSelector({
 	currentUser: selectCurrentUser,
 	modelSettings: selectSettings,
 	isModelPending: selectIsPending,
-	visiblePanels: selectVisiblePanels,
+	leftPanels: selectLeftPanels,
+	rightPanels: selectRightPanels,
 	isFocusMode: selectIsFocusMode
 });
 
@@ -40,7 +43,6 @@ export const mapDispatchToProps = (dispatch) => bindActionCreators({
 	fetchData: ViewerGuiActions.fetchData,
 	resetPanelsStates: ViewerGuiActions.resetPanelsStates,
 	setPanelVisibility: ViewerGuiActions.setPanelVisibility,
-	loadModel: ViewerGuiActions.loadModel,
 	stopListenOnSelections: TreeActions.stopListenOnSelections,
 	stopListenOnModelLoaded: ViewerGuiActions.stopListenOnModelLoaded,
 	stopListenOnClickPin: ViewerGuiActions.stopListenOnClickPin,

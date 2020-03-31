@@ -22,30 +22,46 @@ import { createStructuredSelector } from 'reselect';
 
 import {
 	selectCollaboratorLimit,
+	selectCurrentTeamspace,
+	selectInvitationsCount,
+	selectLicensesCount,
 	selectUsers,
+	selectUsersPending,
 	selectUsersSuggestions,
+	selectUserNotExists,
 	UserManagementActions
 } from '../../modules/userManagement';
 import { Users } from './users.component';
 
+import { DialogActions } from '../../modules/dialog';
 import { selectJobs } from '../../modules/jobs';
-import { TeamspacesActions } from '../../modules/teamspaces';
+import { selectModels, selectProjects, TeamspacesActions } from '../../modules/teamspaces';
 
 const mapStateToProps = createStructuredSelector({
 	usersSuggestions: selectUsersSuggestions,
 	users: selectUsers,
 	jobs: selectJobs,
-	limit: selectCollaboratorLimit
+	limit: selectCollaboratorLimit,
+	licencesCount: selectLicensesCount,
+	invitationsCount: selectInvitationsCount,
+	userNotExists: selectUserNotExists,
+	projects: selectProjects,
+	models: selectModels,
+	currentTeamspace: selectCurrentTeamspace,
+	selectedTeamspace: selectCurrentTeamspace,
+	isPending: selectUsersPending,
 });
 
 export const mapDispatchToProps = (dispatch) => bindActionCreators({
 	addUser: UserManagementActions.addUser,
 	removeUser: UserManagementActions.removeUser,
-	updateJob: UserManagementActions.updateJob,
+	updateUserJob: UserManagementActions.updateUserJob,
 	updatePermissions: UserManagementActions.updatePermissions,
 	onUsersSearch: UserManagementActions.getUsersSuggestions,
 	clearUsersSuggestions: UserManagementActions.clearUsersSuggestions,
-	fetchQuotaInfo: TeamspacesActions.fetchQuotaInfo
+	fetchQuotaInfo: TeamspacesActions.fetchQuotaInfo,
+	showDialog: DialogActions.showDialog,
+	fetchQuotaAndInvitations: UserManagementActions.fetchQuotaAndInvitations
 }, dispatch);
 
 export default withRouter(

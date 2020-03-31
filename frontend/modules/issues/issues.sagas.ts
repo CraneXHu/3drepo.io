@@ -141,15 +141,11 @@ function* saveIssue({ teamspace, model, issueData, revision, finishSubmitting, i
 		viewpoint.screenshot = screenshot.substring(screenshot.indexOf(',') + 1);
 
 		const issue = {
-			...omit(issueData, ['author', 'statusColor']),
+			...omit(issueData, ['author', 'statusColor', 'roleColor', 'defaultHidden']),
 			owner: issueData.author,
 			rev_id: revision,
-			objectId: null,
 			creator_role: userJob._id,
 			viewpoint,
-			pickedPos: null,
-			pickedNorm: null,
-			scale: 1.0
 		};
 
 		const { data: savedIssue } = yield API.saveIssue(teamspace, model, issue);
@@ -369,7 +365,7 @@ function* focusOnIssue({ issue, revision }) {
 		yield Viewer.isViewerReady();
 
 		// Remove highlight from any multi objects
-		yield Viewer.highlightObjects([]);
+		yield Viewer.clearHighlights();
 		yield put(TreeActions.clearCurrentlySelected());
 
 		const hasViewpoint = issue.viewpoint;
@@ -395,11 +391,7 @@ function* focusOnIssue({ issue, revision }) {
 				Viewer.setCamera({ ...viewpoint, account, model });
 			}
 
-			yield Viewer.updateClippingPlanes({
-				clippingPlanes: viewpoint.clippingPlanes,
-				account,
-				model
-			});
+			yield Viewer.updateClippingPlanes(viewpoint.clippingPlanes, account, model);
 		} else {
 			yield Viewer.goToDefaultViewpoint();
 		}
@@ -422,7 +414,6 @@ function* setActiveIssue({ issue, revision, ignoreViewer = false }) {
 		if (issue) {
 			const {account , model, _id} = issue;
 			yield put(IssuesActions.subscribeOnIssueCommentsChanges(account, model, _id));
-			yield put(IssuesActions.fetchIssue(account , model, _id));
 		}
 
 		yield all([
@@ -452,14 +443,8 @@ function* goToIssue({ issue }) {
 
 function* showDetails({ revision, issueId }) {
 	try {
-		const activeIssue = yield select(selectActiveIssueDetails);
-		const componentState = yield select(selectComponentState);
 		const issuesMap = yield select(selectIssuesMap);
 		const issue = issuesMap[issueId];
-
-		if (componentState.showDetails && !isEqual(activeIssue.position, componentState.savedPin)) {
-			yield put(IssuesActions.updateSelectedIssuePin(componentState.savedPin));
-		}
 
 		yield put(IssuesActions.setActiveIssue(issue, revision));
 		yield put(IssuesActions.setComponentState({ showDetails: true, savedPin: issue.position }));
@@ -473,11 +458,14 @@ function* closeDetails() {
 		const activeIssue = yield select(selectActiveIssueDetails);
 		const componentState = yield select(selectComponentState);
 
-		if (!isEqual(activeIssue.position, componentState.savedPin)) {
-			yield put(IssuesActions.updateSelectedIssuePin(componentState.savedPin));
+		if (componentState.showDetails) {
+			if (!isEqual(activeIssue.position, componentState.savedPin)) {
+				yield put(IssuesActions.updateSelectedIssuePin(componentState.savedPin));
+			}
+
+			yield put(IssuesActions.setComponentState({ showDetails: false, savedPin: null }));
 		}
 
-		yield put(IssuesActions.setComponentState({ showDetails: false, savedPin: null }));
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('close', 'issue details', error));
 	}
@@ -631,7 +619,7 @@ export function* removeResource({ resource }) {
 		const model  = yield select(selectCurrentModel);
 		const username = (yield select(selectCurrentUser)).username;
 
-		yield API.removeResource(teamspace, model, issueId, resource._id);
+		yield API.removeResourceFromIssue(teamspace, model, issueId, resource._id);
 		yield put(IssuesActions.removeResourceSuccess(resource, issueId));
 		yield put(IssuesActions.createCommentSuccess(createRemoveResourceComment(username, resource), issueId));
 	} catch (error) {
@@ -666,7 +654,7 @@ export function* attachFileResources({ files }) {
 
 		yield put(IssuesActions.attachResourcesSuccess( prepareResources(teamspace, model, tempResources), issueId));
 
-		const { data } = yield API.attachFileResources(teamspace, model, issueId, names, files, (progress) => {
+		const { data } = yield API.attachFileResourcesToIssue(teamspace, model, issueId, names, files, (progress) => {
 			const updates = tempResources.map((r) => (
 				{
 					progress: progress * 100,
@@ -698,7 +686,7 @@ export function* attachLinkResources({ links }) {
 		const urls = links.map((link) => link.link);
 		const username = (yield select(selectCurrentUser)).username;
 
-		const {data} = yield API.attachLinkResources(teamspace, model, issueId, names, urls);
+		const {data} = yield API.attachLinkResourcesToIssue(teamspace, model, issueId, names, urls);
 		const resources = prepareResources(teamspace, model, data);
 		yield put(IssuesActions.attachResourcesSuccess(resources, issueId));
 		yield put(IssuesActions.createCommentsSuccess(createAttachResourceComments(username, data), issueId));

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -16,7 +16,6 @@
  */
 
 import RemoveCircle from '@material-ui/icons/RemoveCircle';
-import { isEmpty, isEqual } from 'lodash';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -56,6 +55,7 @@ interface IProps {
 	create: (teamspace, job) => void;
 	remove: (teamspace, jobId) => void;
 	updateColor: (teamspace, job) => void;
+	fetchJobsAndColors: () => void;
 }
 
 interface IState {
@@ -113,24 +113,10 @@ export class Jobs extends React.PureComponent<IProps, IState> {
 
 	public componentDidMount() {
 		const containerElement = (ReactDOM.findDOMNode(this) as HTMLElement).parentNode;
-		this.setState({
-			containerElement,
-			rows: this.getJobsTableRows(this.props.jobs, this.props.colors)
-		});
-	}
+		this.setState({ containerElement });
 
-	public componentDidUpdate(prevProps) {
-		const changes = {} as any;
-
-		const colorsChanged = !isEqual(prevProps.colors, this.props.colors);
-		const jobsChanged = !isEqual(prevProps.jobs, this.props.jobs);
-
-		if (jobsChanged || colorsChanged) {
-			changes.rows = this.getJobsTableRows(this.props.jobs, this.props.colors);
-		}
-
-		if (!isEmpty(changes)) {
-			this.setState(changes);
+		if (!this.props.jobs.length || !this.props.colors.length) {
+			this.props.fetchJobsAndColors();
 		}
 	}
 
@@ -152,14 +138,15 @@ export class Jobs extends React.PureComponent<IProps, IState> {
 	)
 
 	public render() {
-		const { containerElement, rows } = this.state;
+		const { jobs, colors } =  this.props;
+		const { containerElement } = this.state;
 
 		return (
 			<Container>
 				<UserManagementTab footerLabel="Manage jobs">
 					<CustomTable
 						cells={JOBS_TABLE_CELLS}
-						rows={rows}
+						rows={this.getJobsTableRows(jobs, colors)}
 					/>
 				</UserManagementTab>
 				{containerElement && this.renderNewJobForm(containerElement)}

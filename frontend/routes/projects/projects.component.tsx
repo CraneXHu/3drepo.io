@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -15,19 +15,20 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react';
+
 import FormControl from '@material-ui/core/FormControl';
 import Grid from '@material-ui/core/Grid';
 import InputLabel from '@material-ui/core/InputLabel';
-import {isEmpty, isEqual} from 'lodash';
 import * as queryString from 'query-string';
-import React from 'react';
 import { Route } from 'react-router-dom';
 
 import { CellSelect } from '../components/customTable/components/cellSelect/cellSelect.component';
+import { Container } from '../components/customTable/customTable.styles';
 import { UserManagementTab } from '../components/userManagementTab/userManagementTab.component';
 import { ModelsPermissions } from '../modelsPermissions';
-import { ProjectsPermissions } from '../projectsPermissions';
-import { Container, IconLeft, IconRight, Options, SelectContainer, SwitchButton } from './projects.styles';
+import { IconLeft, IconRight, Options, SelectContainer, SwitchButton } from './projects.styles';
+import { ProjectsPermissions } from './projectsPermissions';
 
 export const PERMISSIONS_VIEWS = {
 	PROJECTS: 0,
@@ -41,8 +42,9 @@ interface IProps {
 	location: any;
 	history: any;
 	projects: any[];
-	currentProject: any;
+	project: any;
 	users: any[];
+	selectedProject?: string;
 	onProjectChange?: (project) => void;
 }
 
@@ -52,7 +54,6 @@ interface IState {
 	projectsPermissions: any[];
 	modelsPermissions: any[];
 	selectedModels: any[];
-	selectedProject: string;
 }
 
 export class Projects extends React.PureComponent<IProps, IState> {
@@ -96,50 +97,21 @@ export class Projects extends React.PureComponent<IProps, IState> {
 
 	public onProjectChange = (event, projectName) => {
 		this.updateUrlParams({project: projectName});
-		if (this.props.onProjectChange) {
-			this.props.onProjectChange(projectName);
-		}
 	}
 
-	public getFooterLabel = (currentView) => {
+	public getFooterLabel = () => {
 		const type = this.isProjectViewActive ? 'project' : 'model and federation';
 		return `Assign ${type} permissions`;
 	}
 
 	public componentDidMount() {
-		const {projects, location} = this.props;
-		const state = {
-			projectsItems: getProjectsItems(projects)
-		} as any;
-
-		const queryParams = queryString.parse(location.search);
-
-		const project = projects.find(({ name }) => name === queryParams.project);
-
-		if (project) {
-			state.selectedProject = queryParams.project;
-			this.onProjectChange(null, queryParams.project);
-		} else {
-			state.selectedProject = '';
-		}
-		this.setState(state);
+		this.props.onProjectChange(this.props.selectedProject);
 	}
 
-	public componentDidUpdate(prevProps, prevState) {
-		const changes = {} as IState;
-
-		const projectsChanged = !isEqual(prevProps.projects, this.props.projects);
-		if (projectsChanged) {
-			changes.projectsItems = getProjectsItems(this.props.projects);
-		}
-
-		const selectedProjectChanged = this.state.selectedProject !== prevState.selectedProject;
+	public componentDidUpdate(prevProps) {
+		const selectedProjectChanged = this.props.selectedProject !== prevProps.selectedProject;
 		if (selectedProjectChanged && this.props.onProjectChange) {
-			this.props.onProjectChange(this.state.selectedProject);
-		}
-
-		if (!isEmpty(changes)) {
-			this.setState(changes);
+			this.props.onProjectChange(this.props.selectedProject);
 		}
 	}
 
@@ -151,49 +123,47 @@ export class Projects extends React.PureComponent<IProps, IState> {
 	)
 
 	public render() {
-		const { match } = this.props;
-		const {currentView, selectedProject, projectsItems} = this.state;
-		const footerLabel = this.getFooterLabel(currentView);
+		const { match, projects, selectedProject } = this.props;
+		const { currentView } = this.state;
+
 		return (
-			<Container>
-				<UserManagementTab footerLabel={footerLabel} >
-					<>
-						<Options
-							container
-							direction="row"
-							justify="space-between"
-							alignContent="center"
-						>
-							<SelectContainer item>
-								<FormControl fullWidth>
-									<InputLabel shrink htmlFor="project">
-										Project
-									</InputLabel>
-									<CellSelect
-										items={projectsItems}
-										value={selectedProject}
-										placeholder="Select a project"
-										disabledPlaceholder
-										onChange={this.onProjectChange}
-										inputId="project"
-									/>
-								</FormControl>
-							</SelectContainer>
-							<Grid item>
-								<SwitchButton
-									color="secondary"
-									onClick={this.handleViewChange}
-								>
-									{currentView === PERMISSIONS_VIEWS.MODELS && <IconLeft>keyboard_arrow_left</IconLeft>}
-									{currentView !== PERMISSIONS_VIEWS.MODELS ? 'Model & federation permissions' : 'Project permissions'}
-									{currentView !== PERMISSIONS_VIEWS.MODELS && <IconRight>keyboard_arrow_right</IconRight>}
-								</SwitchButton>
-							</Grid>
-						</Options>
-						<Route path={match.url} render={this.renderPermissionsView} />
-					</>
-				</UserManagementTab>
-			</Container>
+			<UserManagementTab footerLabel={this.getFooterLabel()} >
+				<Container>
+					<Options
+						container
+						direction="row"
+						justify="space-between"
+						alignContent="center"
+					>
+						<SelectContainer item>
+							<FormControl fullWidth>
+								<InputLabel shrink htmlFor="project">
+									Project
+								</InputLabel>
+								<CellSelect
+									items={getProjectsItems(projects)}
+									value={selectedProject}
+									placeholder="Select a project"
+									disabledPlaceholder
+									onChange={this.onProjectChange}
+									inputId="project"
+								/>
+							</FormControl>
+						</SelectContainer>
+						<Grid item>
+							<SwitchButton
+								color="secondary"
+								onClick={this.handleViewChange}
+							>
+								{currentView === PERMISSIONS_VIEWS.MODELS && <IconLeft>keyboard_arrow_left</IconLeft>}
+								{currentView !== PERMISSIONS_VIEWS.MODELS ? 'Model & federation permissions' : 'Project permissions'}
+								{currentView !== PERMISSIONS_VIEWS.MODELS && <IconRight>keyboard_arrow_right</IconRight>}
+							</SwitchButton>
+						</Grid>
+					</Options>
+					<Route path={match.url} render={this.renderPermissionsView} />
+				</Container>
+			</UserManagementTab>
 		);
 	}
 }

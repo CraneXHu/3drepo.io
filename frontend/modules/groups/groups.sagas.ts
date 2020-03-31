@@ -43,7 +43,8 @@ import {
 	selectIsAllOverridden,
 	selectNewGroupDetails,
 	selectSelectedFilters,
-	selectShowDetails
+	selectShowDetails,
+	selectUnalteredActiveGroupDetails
 } from './groups.selectors';
 
 function* fetchGroups({teamspace, modelId, revision}) {
@@ -90,8 +91,7 @@ function* resetActiveGroup() {
 
 function* highlightGroup({ group }) {
 	try {
-		const color = group.color ? hexToGLColor(group.color) :
-		Viewer.getDefaultHighlightColor();
+		const color = group.color ? hexToGLColor(group.color) : Viewer.getDefaultHighlightColor();
 		yield put(GroupsActions.addToHighlighted(group._id));
 
 		if (group.objects && group.objects.length > 0) {
@@ -206,7 +206,7 @@ function* downloadGroups({ teamspace, modelId }) {
 		const endpointBase =
 			`${teamspace}/${modelId}/revision/master/head/groups/?noIssues=true&noRisks=true`;
 		const endpoint = ids ? `${endpointBase}&ids=${ids}` : endpointBase;
-		const modelName = Viewer.viewer && Viewer.viewer.settings ? Viewer.viewer.settings.name : '';
+		const modelName = Viewer.settings ? Viewer.settings.name : '';
 		yield API.downloadJSON('groups', modelName, `${endpoint}&convertCoords=true`);
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('download', 'groups', error));
@@ -229,7 +229,7 @@ function* showDetails({ group, revision }) {
 
 function* closeDetails() {
 	try {
-		const activeGroup = yield select(selectActiveGroupDetails);
+		const activeGroup = yield select(selectUnalteredActiveGroupDetails);
 		yield put(GroupsActions.highlightGroup(activeGroup));
 		yield put(GroupsActions.setComponentState({ showDetails: false }));
 
@@ -298,9 +298,7 @@ function* updateGroup({ teamspace, modelId, revision, groupId }) {
 			preparedGroup.totalSavedMeshes = groupToSave.totalSavedMeshes;
 		}
 
-		yield put(TreeActions.getSelectedNodes());
 		yield put(GroupsActions.updateGroupSuccess(preparedGroup));
-		yield put(TreeActions.clearCurrentlySelected());
 		yield put(GroupsActions.highlightGroup(preparedGroup));
 		yield put(SnackbarActions.show('Group updated'));
 	} catch (error) {
@@ -383,13 +381,11 @@ function* unsubscribeFromChanges({ teamspace, modelId }) {
 }
 
 function* resetToSavedSelection({ groupId }) {
-	const groups = yield select(selectGroupsMap);
-	const activeGroup = yield select(selectActiveGroupDetails);
-	const initialGroupState = groups[groupId] || activeGroup;
-	activeGroup.rules = (groups[groupId] || { rules: [] }).rules;
+	const activeGroup = yield select(selectUnalteredActiveGroupDetails);
+	activeGroup.rules = (activeGroup || { rules: [] }).rules;
 
 	yield all([
-		put(GroupsActions.selectGroup(initialGroupState)),
+		put(GroupsActions.selectGroup(activeGroup)),
 		put(GroupsActions.setComponentState({ newGroup: activeGroup }))
 	]);
 }

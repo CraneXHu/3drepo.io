@@ -7,7 +7,6 @@ import chatSaga from './chat/chat.sagas';
 import compareSaga from './compare/compare.sagas';
 import currentUserSaga from './currentUser/currentUser.sagas';
 import dialogSaga from './dialog/dialog.sagas';
-import gisSaga from './gis/gis.sagas';
 import groupsSaga from './groups/groups.sagas';
 import issuesSaga from './issues/issues.sagas';
 import jobsSaga from './jobs/jobs.sagas';
@@ -15,6 +14,7 @@ import measureSaga from './measure/measure.sagas';
 import modelSaga from './model/model.sagas';
 import notificationsSaga from './notifications/notifications.sagas';
 import risksSaga from './risks/risks.sagas';
+import sequencesSaga from './sequences/sequences.sagas';
 import starredSaga from './starred/starred.sagas';
 import startupSaga from './startup/startup.sagas';
 import teamspacesSaga from './teamspaces/teamspaces.sagas';
@@ -38,7 +38,6 @@ export default function* rootSaga() {
 		fork(authSaga),
 		fork(notificationsSaga),
 		fork(usersSaga),
-		fork(gisSaga),
 		fork(viewerSaga),
 		fork(risksSaga),
 		fork(viewpointsSaga),
@@ -52,6 +51,8 @@ export default function* rootSaga() {
 		fork(chatSaga),
 		fork(viewerGuiSaga),
 		fork(dialogSaga),
-		fork(boardSaga) // <-- INJECT MODULE SAGA -->
+		fork(boardSaga),
+		fork(sequencesSaga)
+		// <-- INJECT MODULE SAGA -->
 	]);
 }

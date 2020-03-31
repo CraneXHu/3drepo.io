@@ -15,6 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import { pick } from 'lodash';
 import { createSelector } from 'reselect';
 import { getActiveRevisions } from '../../helpers/revisions';
 import { selectUrlParams } from '../router/router.selectors';
@@ -25,13 +26,25 @@ export const selectSettings = createSelector(
 	selectModelDomain, (state) => state.settings
 );
 
+export const selectPermissions = createSelector(
+	selectSettings, (state) => state.permissions
+);
+
+export const selectGISCoordinates = createSelector(
+	selectSettings, (settings) => pick(settings, ['surveyPoints', 'angleFromNorth'])
+);
+
+export const selectHasGISCoordinates = createSelector(
+	selectGISCoordinates, (coordinates) => (coordinates.surveyPoints || []).length > 0
+);
+
 export const selectRevisions = createSelector(
 	selectModelDomain, (state) => state.revisions
 );
 
 export const selectCurrentRevision = createSelector(
 	selectRevisions, selectUrlParams, (revisions, params) => {
-		const paramRevision = params.revision ?
+		const paramRevision = (params || {}).revision ?
 			revisions.find((revision) => revision.tag === params.revision ||  revision._id === params.revision)
 			: null;
 

@@ -19,14 +19,13 @@ import { compact, map, orderBy, pick, pickBy, uniq, values } from 'lodash';
 import { createSelector } from 'reselect';
 import { SORT_ORDER_TYPES } from '../../constants/sorting';
 import { searchByFilters } from '../../helpers/searching';
-import { DATA_TYPES, FILTER_TYPES } from '../../routes/components/filterPanel/filterPanel.component';
+import { DATA_TYPES } from '../../routes/components/filterPanel/filterPanel.component';
 import {
 	LIST_ITEMS_TYPES, SORTING_BY_LAST_UPDATED, SORTING_BY_NAME,
 } from '../../routes/teamspaces/teamspaces.contants';
 import { selectStarredModels } from '../starred';
 import { getStarredModelKey } from '../starred/starred.contants';
 import { sortModels } from './teamspaces.helpers';
-import { extendTeamspacesInfo } from './teamspaces.helpers';
 
 export const selectTeamspacesDomain = (state) => ({ ...state.teamspaces });
 
@@ -261,10 +260,6 @@ export const selectFlattenTeamspaces = createSelector(
 		}
 		return flattenList;
 	}
-);
-
-export const selectTeamspacesWithAdminAccess = createSelector(
-	selectTeamspacesList, selectProjects, extendTeamspacesInfo
 );
 
 export const selectIsPending = createSelector(

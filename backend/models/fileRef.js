@@ -25,6 +25,7 @@ const nodeuuid = require("uuid/v1");
 
 const ORIGINAL_FILE_REF_EXT = ".history.ref";
 const UNITY_BUNDLE_REF_EXT = ".stash.unity3d.ref";
+const STATE_FILE_REF_EXT = ".sequences.ref";
 const JSON_FILE_REF_EXT = ".stash.json_mpc.ref";
 const RESOURCES_FILE_REF_EXT = ".resources.ref";
 
@@ -58,7 +59,7 @@ function fetchFile(account, model, ext, fileName, metadata = false) {
 			});
 
 			// Temporary fall back - read from gridfs
-			const fullName = ext === ORIGINAL_FILE_REF_EXT ?
+			const fullName = (ext === ORIGINAL_FILE_REF_EXT || ext === STATE_FILE_REF_EXT) ?
 				fileName :
 				`/${account}/${model}/${fileName.split("/").length > 1 ? "revision/" : ""}${fileName}`;
 			return ExternalServices.getFile(account, collection, "gridfs", fullName);
@@ -135,38 +136,6 @@ async function insertRefInResources(account, model, user, name, refInfo) {
 	return ref;
 }
 
-async function removeResource(account, model,  resourceId, property, propertyId) {
-	if (!account || !model || !resourceId || !propertyId) {
-		throw ResponseCodes.INVALID_ARGUMENTS;
-	}
-
-	const collName = model + RESOURCES_FILE_REF_EXT;
-	const collection = await DB.getCollection(account, collName);
-	const ref = await collection.findOne({_id: resourceId});
-
-	if (!Array.isArray(ref[property]) || ref[property].indexOf(propertyId) === -1) {
-		throw ResponseCodes.RESOURCE_NOT_ATTACHED;
-	}
-
-	ref[property] = ref[property].filter(entry => entry !== propertyId);
-
-	const refCounts = attachResourceProps.reduce((prev, p) => prev + (ref[p] || []).length, 0);
-
-	if (!refCounts) {
-		if (ref.type !== "http") {
-			await ExternalServices.removeFiles(account, collection, ref.type, [ref.link]);
-		}
-
-		await collection.remove({_id:resourceId});
-	} else {
-		delete ref._id;
-		await collection.update({_id: resourceId}, { $set: ref });
-	}
-
-	ref[property] = [propertyId]; // This is to identify from where this ref has been dettached
-	return ref;
-}
-
 const FileRef = {};
 
 FileRef.getOriginalFile = function(account, model, fileName) {
@@ -201,6 +170,10 @@ FileRef.getUnityBundle = function(account, model, fileName) {
 	return fetchFile(account, model, UNITY_BUNDLE_REF_EXT, fileName);
 };
 
+FileRef.getSequenceStateFile = function(account, model, fileName) {
+	return fetchFile(account, model, STATE_FILE_REF_EXT, fileName);
+};
+
 FileRef.getJSONFile = function(account, model, fileName) {
 	return fetchFile(account, model, JSON_FILE_REF_EXT, fileName);
 };
@@ -227,8 +200,36 @@ FileRef.removeAllFilesFromModel = function(account, model) {
 	return Promise.all(promises);
 };
 
-FileRef.removeResourceFromIssue = async function(account, model, issueId, resourceId) {
-	return await removeResource(account, model, resourceId, ISSUES_RESOURCE_PROP, issueId);
+FileRef.removeResourceFromEntity  = async function(account, model, property, propertyId, resourceId) {
+	if (!account || !model || !resourceId || !propertyId) {
+		throw ResponseCodes.INVALID_ARGUMENTS;
+	}
+
+	const collName = model + RESOURCES_FILE_REF_EXT;
+	const collection = await DB.getCollection(account, collName);
+	const ref = await collection.findOne({_id: resourceId});
+
+	if (!Array.isArray(ref[property]) || ref[property].indexOf(propertyId) === -1) {
+		throw ResponseCodes.RESOURCE_NOT_ATTACHED;
+	}
+
+	ref[property] = ref[property].filter(entry => entry !== propertyId);
+
+	const refCounts = attachResourceProps.reduce((prev, p) => prev + (ref[p] || []).length, 0);
+
+	if (!refCounts) {
+		if (ref.type !== "http") {
+			await ExternalServices.removeFiles(account, collection, ref.type, [ref.link]);
+		}
+
+		await collection.remove({_id:resourceId});
+	} else {
+		delete ref._id;
+		await collection.update({_id: resourceId}, { $set: ref });
+	}
+
+	ref[property] = [propertyId]; // This is to identify from where this ref has been dettached
+	return ref;
 };
 
 FileRef.storeFileAsResource = async function(account, model, user, name, data, extraFields = null) {

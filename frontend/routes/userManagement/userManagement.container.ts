@@ -22,32 +22,29 @@ import { createStructuredSelector } from 'reselect';
 
 import {
 	selectCurrentTeamspace,
-	selectIsPending,
 	selectIsTeamspaceAdmin,
 	UserManagementActions
 } from '../../modules/userManagement';
 import { UserManagement } from './userManagement.component';
 
-import { selectTeamspacesWithAdminAccess } from '../../modules/teamspaces/teamspaces.selectors';
-
 import {
 	selectCurrentTeamspace as selectDefaultTeamspace,
 	selectCurrentUser
 } from '../../modules/currentUser';
-import { TeamspacesActions } from '../../modules/teamspaces';
+import { selectIsPending, selectTeamspacesList, TeamspacesActions } from '../../modules/teamspaces';
 
 const mapStateToProps = createStructuredSelector({
 	defaultTeamspace: selectDefaultTeamspace,
 	selectedTeamspace: selectCurrentTeamspace,
-	teamspaces: selectTeamspacesWithAdminAccess,
+	teamspaces: selectTeamspacesList,
 	isTeamspaceAdmin: selectIsTeamspaceAdmin,
 	isLoadingTeamspace: selectIsPending,
-	currentUser: selectCurrentUser
+	currentUser: selectCurrentUser,
 });
 
 export const mapDispatchToProps = (dispatch) => bindActionCreators({
 	fetchTeamspaces: TeamspacesActions.fetchTeamspaces,
-	onTeamspaceChange: UserManagementActions.fetchTeamspaceDetails
+	fetchUsers: UserManagementActions.fetchTeamspaceUsers
 }, dispatch);
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(UserManagement));

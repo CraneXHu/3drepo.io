@@ -28,6 +28,8 @@ export const Container = styled(Paper)`
 		display: flex;
 		flex-direction: column;
 		overflow: hidden;
+		box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.2), 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+		border-radius: 4px;
 	}
 `;
 
@@ -57,8 +59,10 @@ export const Content = styled.div`
 export const ContentWrapper = styled.div`
 	height: 100%;
 	white-space: pre-line;
-	overflow: ${(props: any) => props.hiddenScrollbars ? 'hidden' : 'auto'};display: flex;
+	overflow: ${(props: any) => props.hiddenScrollbars ? 'hidden' : 'auto'};
+	display: flex;
 	flex-direction: column;
+	justify-content: ${(props: any) => props.disableStretching ? 'flex-start' : 'space-between'};
 `as any;
 
 export const LoaderContainer = styled.div`

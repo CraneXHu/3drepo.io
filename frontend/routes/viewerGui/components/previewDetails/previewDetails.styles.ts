@@ -27,7 +27,7 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-import { COLOR } from './../../../../styles/colors';
+import { COLOR } from '../../../../styles';
 
 const SUMMARY_HEIGHT = 64;
 
@@ -35,6 +35,9 @@ export const Container = styled.div`
 	color: ${COLOR.BLACK_60};
 	background-color: ${COLOR.WHITE};
 	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
 `;
 
 export const Collapsable = styled(ExpansionPanel)`
@@ -50,8 +53,9 @@ export const Details = styled(ExpansionPanelDetails)`
 	&& {
 		display: flex;
 		flex-direction: column;
-		padding: 48px 2px 0;
+		padding: 0 2px;
 		position: relative;
+		padding-top: ${(props: any) => props.margin ? `${props.margin + 12}px` : '0px'};
 	}
 `;
 
@@ -93,7 +97,9 @@ export const Content = styled.div`
 	background-color: ${COLOR.BLACK_6};
 `;
 
-export const NotCollapsableContent = styled.div``;
+export const NotCollapsableContent = styled.div`
+	height: 100%;
+`;
 
 export const ToggleButtonContainer = styled.div`
 	display: flex;
@@ -119,6 +125,9 @@ export const ToggleIcon = styled(ExpandMoreIcon)`
 ` as any;
 
 export const Typography = styled(TypographyComponent)`
-	max-height: 40px;
-	overflow: hidden;
+	&& {
+		max-height: 40px;
+		overflow: hidden;
+		margin-right: 24px;
+	}
 `;

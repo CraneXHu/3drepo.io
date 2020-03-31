@@ -18,11 +18,11 @@ import { delay } from 'redux-saga';
 import { all, call, put, select, take, takeLatest } from 'redux-saga/effects';
 
 import { VIEWER_EVENTS } from '../../constants/viewer';
-import { dispatch } from '../../modules/store';
 import * as API from '../../services/api';
 import { Viewer } from '../../services/viewer/viewer';
 import { DialogActions } from '../dialog';
 import { GroupsActions } from '../groups';
+import { dispatch } from '../store';
 import {
 	selectActiveNode,
 	selectDefaultHiddenNodesIds,
@@ -40,7 +40,9 @@ import TreeProcessing from './treeProcessing/treeProcessing';
 
 import { SELECTION_STATES, VISIBILITY_STATES } from '../../constants/tree';
 import { VIEWER_PANELS } from '../../constants/viewerGui';
-import { addColorOverrides, overridesDiff, removeColorOverrides } from '../../helpers/colorOverrides';
+
+import { addTransparencyOverrides, overridesTransparencyDiff,
+	removeTransparencyOverrides } from '../../helpers/colorOverrides';
 import { MultiSelect } from '../../services/viewer/multiSelect';
 import { selectActiveMeta, selectIsActive, BimActions } from '../bim';
 import { selectSettings, ModelTypes } from '../model';
@@ -51,11 +53,7 @@ const unhighlightObjects = (objects = []) => {
 	for (let index = 0, size = objects.length; index < size; index++) {
 		const { meshes, teamspace, modelId } = objects[index];
 
-		Viewer.unhighlightObjects({
-			account: teamspace,
-			model: modelId,
-			ids: meshes
-		});
+		Viewer.unhighlightObjects(teamspace, modelId, meshes);
 	}
 };
 
@@ -66,15 +64,7 @@ const highlightObjects = (objects = [], nodesSelectionMap = {}, colour?) => {
 		const { meshes, teamspace, modelId } = objects[index];
 		const filteredMeshes = meshes.filter((mesh) => nodesSelectionMap[mesh] === SELECTION_STATES.SELECTED);
 		if (filteredMeshes.length) {
-			promises.push(Viewer.highlightObjects({
-				account: teamspace,
-				ids: filteredMeshes,
-				colour,
-				model: modelId,
-				multi: true,
-				source: 'tree',
-				forceReHighlight: true
-			}));
+			promises.push(Viewer.highlightObjects(teamspace, modelId, colour, true, true, filteredMeshes));
 		}
 	}
 	return Promise.all(promises);
@@ -280,6 +270,8 @@ function* clearCurrentlySelected() {
 	if (activeNode) {
 		yield put(TreeActions.setActiveNode(null));
 	}
+
+	yield put(TreeActions.getSelectedNodes());
 }
 
 /**
@@ -400,6 +392,7 @@ function* deselectNodes({ nodesIds = [] }) {
 		}
 
 		yield put(TreeActions.updateDataRevision());
+		yield put(TreeActions.getSelectedNodes());
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('deselect', 'node', error));
 	}
@@ -443,6 +436,7 @@ function* selectNodes({ nodesIds = [], skipExpand = false, colour }) {
 
 		yield put(TreeActions.setActiveNode(lastNodeId));
 		yield put(TreeActions.updateDataRevision());
+		yield put(TreeActions.getSelectedNodes());
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('select', 'nodes', error));
 	}
@@ -549,12 +543,25 @@ function* zoomToHighlightedNodes() {
 	}
 }
 
-function* handleColorOverridesChange({ currentOverrides, previousOverrides }) {
-	const toAdd = overridesDiff(currentOverrides, previousOverrides);
-	const toRemove = overridesDiff(previousOverrides, currentOverrides);
+function* handleTransparencyOverridesChange({ currentOverrides, previousOverrides }) {
+	yield put (TreeActions.showAllNodes());
+	const overrides = Object.keys(currentOverrides).reduce((ov, key) => {
+		if (currentOverrides[key] === 0) {
+			ov.hidden.push(key);
+		} else {
+			ov.unhidden[key] = currentOverrides[key];
+		}
 
-	yield removeColorOverrides(toRemove);
-	yield addColorOverrides(toAdd);
+		return ov;
+	} , {hidden: [], unhidden: {}});
+
+	yield hideTreeNodes(overrides.hidden, true);
+
+	const toAdd = overridesTransparencyDiff(currentOverrides, previousOverrides);
+	const toRemove = overridesTransparencyDiff(previousOverrides, currentOverrides);
+
+	yield removeTransparencyOverrides(toRemove);
+	yield addTransparencyOverrides(toAdd);
 }
 
 export default function* TreeSaga() {
@@ -582,5 +589,5 @@ export default function* TreeSaga() {
 	yield takeLatest(TreeTypes.COLLAPSE_NODES, collapseNodes);
 	yield takeLatest(TreeTypes.GO_TO_ROOT_NODE, goToRootNode);
 	yield takeLatest(TreeTypes.ZOOM_TO_HIGHLIGHTED_NODES, zoomToHighlightedNodes);
-	yield takeLatest(TreeTypes.HANDLE_COLOR_OVERRIDES_CHANGE, handleColorOverridesChange);
+	yield takeLatest(TreeTypes.HANDLE_TRANSPARENCY_OVERRIDES_CHANGE, handleTransparencyOverridesChange);
 }

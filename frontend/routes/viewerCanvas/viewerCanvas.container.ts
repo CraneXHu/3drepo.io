@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -19,21 +19,26 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { createStructuredSelector } from 'reselect';
 
-import { selectOverrides, } from '../../modules/groups';
+import { selectGisLayers } from '../../modules/gis';
 import { selectPins as selectIssuePins } from '../../modules/issues';
+import { selectGISCoordinates, selectHasGISCoordinates } from '../../modules/model';
 import { selectPins as selectRiskPins } from '../../modules/risks';
-import { TreeActions } from '../../modules/tree';
+import { selectAllTransparencyOverrides, selectColorOverrides, TreeActions } from '../../modules/tree';
 import { withViewer } from '../../services/viewer/viewer';
 import { ViewerCanvas } from './viewerCanvas.component';
 
 const mapStateToProps = createStructuredSelector({
-	colorOverrides: selectOverrides,
+	colorOverrides: selectColorOverrides,
+	transparencies: selectAllTransparencyOverrides,
 	issuePins: selectIssuePins,
 	riskPins: selectRiskPins,
+	gisCoordinates: selectGISCoordinates,
+	hasGisCoordinates: selectHasGISCoordinates,
+	gisLayers: selectGisLayers
 });
 
 export const mapDispatchToProps = (dispatch) => bindActionCreators({
-	handleColorOverridesChange: TreeActions.handleColorOverridesChange
+	handleTransparencyOverridesChange: TreeActions.handleTransparencyOverridesChange
 }, dispatch);
 
 export default withViewer(connect(mapStateToProps, mapDispatchToProps)(ViewerCanvas));

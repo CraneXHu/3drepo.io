@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -15,23 +15,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react';
+
 import { IconButton, MenuItem } from '@material-ui/core';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import BuildIcon from '@material-ui/icons/Build';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { includes, isEmpty } from 'lodash';
-import React from 'react';
 
+import { VIEWER_PANELS } from '../../../../constants/viewerGui';
 import { renderWhenTrue } from '../../../../helpers/rendering';
-import { ButtonMenu } from '../../../components/buttonMenu/buttonMenu.component';
 import {
 	IconWrapper,
 	MenuList,
 	StyledItemText,
 	StyledListItem
 } from '../../../components/filterPanel/components/filtersMenu/filtersMenu.styles';
-import { MenuButton as MenuButtonComponent } from '../../../components/menuButton/menuButton.component';
+import { PanelBarActions } from '../panelBarActions';
 import { Settings } from './components/settings/settings.component';
 import {
 	GisContainer,
@@ -51,25 +52,25 @@ interface IProps {
 	updateModelSettings: (modelData, settings) => void;
 	settings: any;
 	isPending: boolean;
+	hasGISCoordinates: boolean;
 	mapsProviders: any[];
-	initialiseMap: (params, sources?) => void;
-	addSource: (source) => void;
-	removeSource: (source) => void;
-	resetSources: () => void;
-	resetMap: () => void;
-	isInitialisedMap: boolean;
-	visibleSources: any[];
+	addVisibleLayer: (layer) => void;
+	removeVisibleLayer: (layer) => void;
+	resetVisibleLayers: () => void;
+	visibleLayers: any[];
 }
+
 interface IState {
 	settingsModeActive: boolean;
 	activeMapIndex: number;
-	visibleSources: any[];
-	pointsExists: boolean;
 }
 
-const MenuButton = (props) => <MenuButtonComponent ariaLabel="Show GIS menu" {...props} />;
-
 export class Gis extends React.PureComponent<IProps, IState> {
+
+	get type() {
+		return VIEWER_PANELS.GIS;
+	}
+
 	get surveySettings() {
 		const { settings } = this.props;
 
@@ -79,10 +80,8 @@ export class Gis extends React.PureComponent<IProps, IState> {
 		};
 	}
 	public state = {
-		settingsModeActive: true,
+		settingsModeActive: false,
 		activeMapIndex: 0,
-		visibleSources: [],
-		pointsExists: false
 	};
 
 	public renderMapLayers = renderWhenTrue(() => {
@@ -100,45 +99,9 @@ export class Gis extends React.PureComponent<IProps, IState> {
 	});
 
 	public componentDidMount() {
-		const { settings, initialiseMap } = this.props;
 		const { teamspace, modelId } = this.getDataFromPathname();
-
 		if (this.props.settings._id) {
 			this.props.fetchModelMaps(teamspace, modelId);
-		}
-
-		const pointsExists = !!(settings && settings.surveyPoints && settings.surveyPoints.length);
-		if (pointsExists) {
-			initialiseMap(this.surveySettings);
-			this.setState({ pointsExists });
-		}
-	}
-
-	public componentDidUpdate(prevProps, prevState) {
-		const { settings, initialiseMap, resetSources } = this.props;
-		const changes = {} as any;
-
-		const pointsExists = !!(settings && settings.surveyPoints && settings.surveyPoints.length);
-
-		if (prevState.pointsExists !== pointsExists) {
-			changes.pointsExists = pointsExists;
-		}
-
-		if (isEmpty(prevProps.settings) && !isEmpty(settings) || settings._id !== prevProps.settings._id) {
-			changes.settingsModeActive = !pointsExists;
-
-			if (pointsExists) {
-				resetSources();
-				initialiseMap(this.surveySettings);
-			}
-		}
-
-		if (prevState.pointsExists !== this.state.pointsExists) {
-			changes.settingsModeActive = !this.state.pointsExists;
-		}
-
-		if (!isEmpty(changes)) {
-			this.setState(changes);
 		}
 	}
 
@@ -147,7 +110,7 @@ export class Gis extends React.PureComponent<IProps, IState> {
 		return { teamspace, modelId, revision };
 	}
 
-	public handleToggleSettings = () => {
+	public toggleSettings = () => {
 		this.setState({
 			settingsModeActive: !this.state.settingsModeActive
 		});
@@ -157,8 +120,8 @@ export class Gis extends React.PureComponent<IProps, IState> {
 		if (this.state.settingsModeActive) {
 			return (
 				<IconButton
-					disabled={!this.state.pointsExists}
-					onClick={this.handleToggleSettings}>
+					disabled={!this.props.hasGISCoordinates}
+					onClick={this.toggleSettings}>
 						<ArrowBackIcon />
 				</IconButton>
 			);
@@ -166,9 +129,9 @@ export class Gis extends React.PureComponent<IProps, IState> {
 		return <GisIcon />;
 	}
 
-	public renderMenuContent = () => (
+	public renderActionsMenu = () => (
 		<MenuList>
-			<StyledListItem onClick={this.handleToggleSettings} button>
+			<StyledListItem onClick={this.toggleSettings} button>
 				<IconWrapper><BuildIcon fontSize="small" /></IconWrapper>
 				<StyledItemText>
 					Settings
@@ -177,43 +140,38 @@ export class Gis extends React.PureComponent<IProps, IState> {
 		</MenuList>
 	)
 
-	public getMenuButton = () => 	(
-		<ButtonMenu
-				key={0}
-				renderButton={MenuButton}
-				renderContent={this.renderMenuContent}
-				PopoverProps={{
-					anchorOrigin: { vertical: 'center', horizontal: 'left' }
-				}}
-				ButtonProps={{
-					disabled: this.props.isPending || this.state.settingsModeActive
-				}}
-		/>
-	)
-
-	public getActions = () => {
-		if (!this.state.settingsModeActive) {
-			return [this.getMenuButton()];
+	public renderActions = () => {
+		if (this.state.settingsModeActive) {
+			return <PanelBarActions type={this.type} hideSearch hideMenu menuDisabled menuOpen={false} />;
 		}
-		return [];
+
+		return (
+			<PanelBarActions
+				type={this.type}
+				menuLabel="Show GIS menu"
+				menuActions={this.renderActionsMenu}
+				menuDisabled={this.props.isPending || this.state.settingsModeActive}
+				hideSearch
+			/>
+		);
 	}
 
 	public handleChangeMapProvider = (event) => {
 		this.setState({
 			activeMapIndex: event.target.value
 		}, () => {
-			this.props.resetSources();
+			this.props.resetVisibleLayers();
 		});
 	}
 
 	public renderHideLayerButton = (layer, statement) => renderWhenTrue(
-		<VisibilityButton onClick={() => this.props.removeSource(layer.source)}>
+		<VisibilityButton onClick={() => this.props.removeVisibleLayer(layer.source)}>
 			<VisibilityIcon />
 		</VisibilityButton>
 	)(statement)
 
 	public renderShowLayerButton = (layer, statement) => renderWhenTrue(
-		<VisibilityButton onClick={() => this.props.addSource(layer.source)}>
+		<VisibilityButton onClick={() => this.props.addVisibleLayer(layer.source)}>
 			<VisibilityOffIcon />
 		</VisibilityButton>
 	)(statement)
@@ -233,8 +191,8 @@ export class Gis extends React.PureComponent<IProps, IState> {
 					<MapName>{layer.name}</MapName>
 				</MapNameWrapper>
 
-				{this.renderShowLayerButton(layer, !includes(this.props.visibleSources, layer.source))}
-				{this.renderHideLayerButton(layer, includes(this.props.visibleSources, layer.source))}
+				{this.renderShowLayerButton(layer, !includes(this.props.visibleLayers, layer.source))}
+				{this.renderHideLayerButton(layer, includes(this.props.visibleLayers, layer.source))}
 			</MapLayer>
 		))
 
@@ -262,15 +220,16 @@ export class Gis extends React.PureComponent<IProps, IState> {
 	}
 
 	public render() {
+		const { hasGISCoordinates } = this.props;
 		const { settingsModeActive } = this.state;
 
 		return (
 			<GisContainer
 				Icon={this.getTitleIcon()}
-				renderActions={this.getActions}
+				renderActions={this.renderActions}
 				pending={this.props.isPending}
 			>
-				{settingsModeActive && (
+				{(settingsModeActive || !hasGISCoordinates) && (
 					<Settings
 							values={this.getSettingsValues()}
 							properties={this.getSettingsProperties()}
@@ -279,8 +238,8 @@ export class Gis extends React.PureComponent<IProps, IState> {
 						/>
 					)
 				}
-				{this.renderMapLayers(!settingsModeActive)}
+				{(!settingsModeActive && hasGISCoordinates) && this.renderMapLayers(!settingsModeActive)}
 			</GisContainer>
-	);
+		);
 	}
 }

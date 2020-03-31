@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -41,6 +41,7 @@ export const Container = styled.div`
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
+	flex: ${(props: { fill: boolean; }) => props.fill ? 1 : 'auto'};
 
 	${TextFieldStyles.StyledTextField} {
 		margin: 1px 0;
@@ -100,7 +101,7 @@ export const HorizontalView = styled.div`
 	${PreviewDetails}, ${LogsContainer} {
 		min-width: 50%;
 		width: 50%;
-		max-height: 60vh;
+		max-height: 75vh;
 		position: relative;
 		overflow: auto;
 	}

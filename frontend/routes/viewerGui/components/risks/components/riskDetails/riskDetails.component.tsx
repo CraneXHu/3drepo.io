@@ -54,6 +54,10 @@ interface IProps {
 	updateNewRisk: (newRisk) => void;
 	setCameraOnViewpoint: (teamspace, modelId, view) => void;
 	updateSelectedRiskPin: (position) => void;
+	onRemoveResource: (resource) => void;
+	attachFileResources: (files) => void;
+	attachLinkResources: (links) => void;
+	showDialog: (config: any) => void;
 }
 
 interface IState {
@@ -89,7 +93,7 @@ export class RiskDetails extends React.PureComponent<IProps, IState> {
 	}
 
 	get isViewerInitialized() {
-		return this.props.viewer.viewer.initialized;
+		return this.props.viewer.initialized;
 	}
 
 	public commentRef = React.createRef<any>();
@@ -230,6 +234,9 @@ export class RiskDetails extends React.PureComponent<IProps, IState> {
 	}
 
 	public renderDetailsForm = () => {
+		const {risk, onRemoveResource, showDialog,
+			currentUser, myJob, attachFileResources, attachLinkResources, updateSelectedRiskPin } = this.props;
+
 		return (
 			<RiskDetailsForm
 				risk={this.riskData}
@@ -237,12 +244,17 @@ export class RiskDetails extends React.PureComponent<IProps, IState> {
 				onValueChange={this.handleRiskFormSubmit}
 				onSubmit={this.handleRiskFormSubmit}
 				permissions={this.props.modelSettings.permissions}
-				currentUser={this.props.currentUser}
-				myJob={this.props.myJob}
-				onChangePin={this.props.updateSelectedRiskPin}
+				currentUser={currentUser}
+				myJob={myJob}
+				onChangePin={updateSelectedRiskPin}
 				onSavePin={this.onPositionSave}
 				hasPin={!this.props.disableViewer && this.riskData.position && this.riskData.position.length}
 				hidePin={this.props.disableViewer}
+				onRemoveResource={onRemoveResource}
+				attachFileResources={attachFileResources}
+				attachLinkResources={attachLinkResources}
+				showDialog={showDialog}
+				canComment={this.userCanComment}
 			/>
 		);
 	}
@@ -300,18 +312,10 @@ export class RiskDetails extends React.PureComponent<IProps, IState> {
 	public postComment = async (teamspace, model, { comment, screenshot }, finishSubmitting) => {
 		const viewpoint = await this.props.viewer.getCurrentViewpoint({ teamspace, model });
 
-		const pinData = await this.props.viewer.getPinData();
-		let position;
-
-		if (pinData) {
-			position = pinData.pickedPos;
-		}
-
 		const riskCommentData = {
 			_id: this.riskData._id,
 			rev_id: this.riskData.rev_id,
 			comment,
-			position,
 			viewpoint: {
 				...viewpoint,
 				screenshot
@@ -337,11 +341,12 @@ export class RiskDetails extends React.PureComponent<IProps, IState> {
 			updateRisk(teamspace, model, { position: risk.position });
 		}
 	}
+
 	public render() {
 		const { failedToLoad, risk, horizontal } = this.props;
 
 		return (
-			<Container>
+			<Container fill={Number(this.isNewRisk)}>
 				<ViewerPanelContent
 					onScroll={this.handlePanelScroll}
 					ref={this.panelRef}

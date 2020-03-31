@@ -16,6 +16,7 @@
  */
 
 import styled from 'styled-components';
+
 import { LogList as LogListBase } from '../../../../../components/logList/logList.component';
 import PreviewDetailsBase from '../../../previewDetails/previewDetails.container';
 
@@ -47,7 +48,7 @@ export const HorizontalView = styled.div`
 	${PreviewDetails}, ${LogsContainer} {
 		min-width: 50%;
 		width: 50%;
-		max-height: 60vh;
+		max-height: 75vh;
 		position: relative;
 		overflow: auto;
 	}

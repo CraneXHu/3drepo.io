@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -24,7 +24,7 @@ import { Form } from 'formik';
 import styled, { css } from 'styled-components';
 
 import { FONT_WEIGHT } from '../../../../../../styles';
-import { COLOR } from '../../../../../../styles/colors';
+import { COLOR } from '../../../../../../styles';
 import * as ImageStyles from '../../../../../components/image/image.styles';
 
 const IconStyles = css`
@@ -40,10 +40,7 @@ export const ViewpointItem = styled(MenuItem)`
 		height: 80px;
 		padding: 8px;
 		background-color: ${(props: any) => props.active ? `${COLOR.BLACK_6}` : 'initial'};
-	}
-
-	&&:not(:first-child) {
-		border-top: 1px solid ${COLOR.BLACK_20};
+		border-bottom: 1px solid ${COLOR.BLACK_20};
 	}
 
 	${ImageStyles.StyledImage} {
@@ -72,6 +69,11 @@ export const IconsGroup = styled.div<{ disabled: boolean }>`
 export const ThumbnailPlaceholder = styled.div`
 	width: 79px;
 	height: 79px;
+	align-items: center;
+	text-align: center;
+	line-height: 5.5;
+	justify-content: center;
+	color: ${COLOR.BLACK_30};
 	border: 1px solid ${COLOR.BLACK_20};
 `;
 

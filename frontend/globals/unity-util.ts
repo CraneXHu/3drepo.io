@@ -1,19 +1,19 @@
 /*
- * Copyright (C) 2017 3D Repo Ltd
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+* Copyright (C) 2017 3D Repo Ltd
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as
+* published by the Free Software Foundation, either version 3 of the
+* License, or (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with this program. If not, see <http://www.gnu.org/licenses/>.
+*/
 declare var Module;
 declare var SendMessage;
 declare var UnityLoader;
@@ -483,7 +483,7 @@ export class UnityUtil {
 	 * @param id - ID of the pin
 	 * @param colour - colour RGB value of the colour to change to. e.g. [1, 0, 0]
 	 */
-	public static changePinColour(id: string, colour: [number]) {
+	public static changePinColour(id: string, colour: number[]) {
 		const params = {
 			color : colour,
 			pinName : id
@@ -681,7 +681,7 @@ export class UnityUtil {
 	 * @param normal - normal vector for the pin (note: this is no longer used)
 	 * @param colour - RGB value for the colour of the pin
 	 */
-	public static dropRiskPin(id: string, position: [number], normal: [number], colour: [number]) {
+	public static dropRiskPin(id: string, position: number[], normal: number[], colour: number[]) {
 		const params = {
 			id,
 			position,
@@ -699,7 +699,7 @@ export class UnityUtil {
 	 * @param normal - normal vector for the pin (note: this is no longer used)
 	 * @param colour - RGB value for the colour of the pin
 	 */
-	public static dropIssuePin(id: string, position: [number], normal: [number], colour: [number]) {
+	public static dropIssuePin(id: string, position: number[], normal: number[], colour: number[]) {
 		const params = {
 			id,
 			position,
@@ -715,6 +715,21 @@ export class UnityUtil {
 
 	public static deselectPin(id: string) {
 		UnityUtil.toUnity('DeselectPin', UnityUtil.LoadingState.MODEL_LOADING, id);
+	}
+
+	/**
+	 * Show x y z coordinates of current point
+	 * @category Configurations
+	 */
+	public static showCoordView() {
+		UnityUtil.toUnity('CoordViewEnable', UnityUtil.LoadingState.MODEL_LOADING, undefined);
+	}
+	/**
+	 * Hide x y z coordinates of current point
+	 * @category Configurations
+	 */
+	public static hideCoordView() {
+		UnityUtil.toUnity('CoordViewDisable', UnityUtil.LoadingState.MODEL_LOADING, undefined);
 	}
 
 	/**
@@ -894,6 +909,14 @@ export class UnityUtil {
 		UnityUtil.toUnity('UnhighlightObjects', UnityUtil.LoadingState.MODEL_LOADED, JSON.stringify(params));
 	}
 
+	public static pauseRendering() {
+		UnityUtil.toUnity('PauseRendering', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
+	public static resumeRendering() {
+		UnityUtil.toUnity('ResumeRendering', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
 	/**
 	 * Loading another model. NOTE: this will also clear the canvas of existing models
 	 * Use branch = master and revision = head to get the latest revision.
@@ -1011,6 +1034,41 @@ export class UnityUtil {
 	}
 
 	/**
+	 * Override the alpha value of given object(s)
+	 * If you are setting opacity to 0, use toggleVisibility instead.
+	 * @category Object Highlighting
+	 * @param account - teamspace the meshes resides in
+	 * @param model - model ID the meshes resides in
+	 * @param meshIDs - unique IDs of the meshes to operate on
+	 * @param opacity - opacity (>0 - 1) value to override with
+	 */
+	public static overrideMeshOpacity(account: string, model: string, meshIDs: [string], opacity: number) {
+		const param: any = {};
+		if (account && model) {
+			param.nameSpace = account + '.' + model;
+		}
+		param.ids = meshIDs;
+		param.opacity = opacity;
+		UnityUtil.toUnity('OverrideMeshOpacity', UnityUtil.LoadingState.MODEL_LOADED, JSON.stringify(param));
+	}
+
+	/**
+	 * Reset override alpha value of given object(s)
+	 * @category Object Highlighting
+	 * @param account - teamspace the meshes resides in
+	 * @param model - model ID the meshes resides in
+	 * @param meshIDs - unique IDs of the meshes to operate on
+	 */
+	public static resetMeshOpacity(account: string, model: string, meshIDs: [string]) {
+		const param: any = {};
+		if (account && model) {
+			param.nameSpace = account + '.' + model;
+		}
+		param.ids = meshIDs;
+		UnityUtil.toUnity('ResetMeshOpacity', UnityUtil.LoadingState.MODEL_LOADED, JSON.stringify(param));
+	}
+
+	/**
 	 * Remove a pin from the viewer
 	 * @category Pins
 	 * @param id - pin identifier
@@ -1043,6 +1101,54 @@ export class UnityUtil {
 	 */
 	public static resetCamera() {
 		UnityUtil.toUnity('ResetCamera', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
+	/**
+	 * Reset the viewpoint to Top down view.
+	 * @category Navigations
+	 */
+	public static topView() {
+		UnityUtil.toUnity('TopView', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
+	/**
+	 * Reset the viewpoint to Bottom up view.
+	 * @category Navigations
+	 */
+	public static bottomView() {
+		UnityUtil.toUnity('BottomView', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
+	/**
+	 * Reset the viewpoint to the left side of the model.
+	 * @category Navigations
+	 */
+	public static leftView() {
+		UnityUtil.toUnity('LeftView', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
+	/**
+	 * Reset the viewpoint to the right side of the model.
+	 * @category Navigations
+	 */
+	public static rightView() {
+		UnityUtil.toUnity('RightView', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
+	/**
+	 * Reset the viewpoint to the front of the model.
+	 * @category Navigations
+	 */
+	public static frontView() {
+		UnityUtil.toUnity('FrontView', UnityUtil.LoadingState.VIEWER_READY, undefined);
+	}
+
+	/**
+	 * Reset the viewpoint to the back of the model.
+	 * @category Navigations
+	 */
+	public static backView() {
+		UnityUtil.toUnity('BackView', UnityUtil.LoadingState.VIEWER_READY, undefined);
 	}
 
 	/**

@@ -1,61 +1,55 @@
+import { memoize } from 'lodash';
 import { WHITE } from './../styles/colors';
 
 const parseHex = (hex) => {
 	hex = hex.replace(/^#/, '');
-	if (hex.length === 8) {
-		hex = hex.substring(0, 6);
+
+	if (hex.length <= 4) {
+		hex = hex.map((v) => [v, v]).flat();
 	}
 
-	if (hex.length === 4) {
-		hex = hex.substring(0, 3);
+	const red = parseInt(hex.substr(0, 2), 16);
+	const green = parseInt(hex.substr(2, 2), 16);
+	const blue = parseInt(hex.substr(4, 2), 16);
+	let alpha: any = {alpha: parseInt(hex.substr(6, 2), 16)};
+
+	if ( isNaN(alpha.alpha)) {
+		alpha = {};
 	}
 
-	if (hex.length === 3) {
-		hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-	}
-
-	const num = parseInt(hex, 16);
-	const red = num >> 16;
-	const green = (num >> 8) & 255;
-	const blue = num & 255;
-
-	return {red, green, blue};
+	return {red, green, blue, ...alpha};
 };
 
-export const hexToGLColor = (hex) => {
-	const {red, green, blue} = parseHex(hex);
-	return [red / 255, green / 255, blue / 255];
-};
+export const hexToGLColor = (hex) => hexToArray(hex).map((v) => v / 255);
 
-export const hexToArray = (hex) => {
-	const {red, green, blue} = parseHex(hex);
-	return [red, green, blue];
-};
+export const GLToHexColor = (glColors) => '#' + glColors.map((c) => componentToHex( Math.round(c * 255))).join('');
+
+export const hexToArray = (hex): number[] => Object.values(parseHex(hex));
 
 export const hexToRgba = (hex, alpha = 1) => {
 	const {red, green, blue} = parseHex(hex);
 	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 };
 
-export const rgbaToHex = (hex) => {
-	const rgb = hex.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+)/i);
+export const rgbaToHex = memoize((rgbaColor): string => {
+	// tslint:disable-next-line:prefer-const
+	let [r, g, b, a] = rgbaColor.match(/[.\d]+/g).map(Number);
+	a = Math.round(a * 255);
+	return '#' + componentToHex(r) + componentToHex(g) + componentToHex(b) + componentToHex(a);
+});
 
-	if (!rgb || rgb.length !== 4) {
-		throw new Error('Invalid RGB(a) colour');
+export const componentToHex = memoize((c) => {
+	if (isNaN(c)) {
+		return '';
 	}
-	return `#${rgb.slice(1).map((v) => (`0${parseInt(v, 10).toString(16)}`).slice(-2)).join('')}`;
-};
 
-export const getRGBA = (color) => {
-	const red = parseInt(color[0], 10);
-	const blue = parseInt(color[1], 10);
-	const green = parseInt(color[2], 10);
-	return `rgba(${red}, ${blue}, ${green}, 1)`;
-};
+	const hex = c.toString(16).toUpperCase();
+	return hex.length === 1 ? '0' + hex : hex;
+});
 
 export const getGroupHexColor = (groupColor) => {
 	if (groupColor) {
-		return rgbaToHex(getRGBA(groupColor));
+		return '#' + groupColor.map(componentToHex).join('');
 	}
 	return WHITE;
 };
@@ -67,3 +61,7 @@ export const getRandomColor = () => {
 		parseInt((Math.random() * 255).toFixed(0), 10)
 	];
 };
+
+export const hasTransparency = (hex) => hex.length === 9;
+
+export const getTransparency = (hex) => parseInt(hex.slice(7), 16) / 255;

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -15,23 +15,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { isEmpty, isEqual } from 'lodash';
 import React from 'react';
 
 import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 import ArrowBack from '@material-ui/icons/ArrowBack';
-import CancelIcon from '@material-ui/icons/Cancel';
 import Check from '@material-ui/icons/Check';
-import SearchIcon from '@material-ui/icons/Search';
+import { isEmpty, isEqual } from 'lodash';
 
 import { CREATE_ISSUE, VIEW_ISSUE } from '../../../../constants/issue-permissions';
-import { ACTIONS_TYPES } from '../../../../constants/issues';
 import { hasPermissions } from '../../../../helpers/permissions';
 import { renderWhenTrue } from '../../../../helpers/rendering';
 import { searchByFilters } from '../../../../helpers/searching';
 import { sortByDate } from '../../../../helpers/sorting';
-import { ButtonMenu } from '../../../components/buttonMenu/buttonMenu.component';
 import {
 	IconWrapper,
 	MenuList,
@@ -39,15 +35,13 @@ import {
 	StyledListItem
 } from '../../../components/filterPanel/components/filtersMenu/filtersMenu.styles';
 import { FilterPanel } from '../../../components/filterPanel/filterPanel.component';
-import { MenuButton as MenuButtonComponent } from '../../../components/menuButton/menuButton.component';
 import { ListNavigation } from '../listNavigation/listNavigation.component';
+import { PanelBarActions } from '../panelBarActions';
 import { PreviewListItem } from '../previewListItem/previewListItem.component';
 import { ListContainer, Summary } from '../risks/risks.styles';
 import { ViewerPanel } from '../viewerPanel/viewerPanel.component';
 import { ViewerPanelButton, ViewerPanelContent, ViewerPanelFooter } from '../viewerPanel/viewerPanel.styles';
 import { EmptyStateInfo } from '../views/views.styles';
-
-const MenuButton = (props) => <MenuButtonComponent ariaLabel="Show filters menu" {...props} />;
 
 interface IHeaderMenuItem {
 	label: string;
@@ -90,6 +84,7 @@ interface IProps {
 
 interface IState {
 	filteredItems: any[];
+	prevScroll: number;
 }
 
 export class ReportedItems extends React.PureComponent<IProps, IState> {
@@ -117,6 +112,7 @@ export class ReportedItems extends React.PureComponent<IProps, IState> {
 	}
 	public state = {
 		filteredItems: [],
+		prevScroll: 0
 	};
 
 	public listViewRef = React.createRef<HTMLElement>();
@@ -169,16 +165,17 @@ export class ReportedItems extends React.PureComponent<IProps, IState> {
 		/>
 	));
 
-	public renderHeaderNavigation = renderWhenTrue(() => {
+	public renderHeaderNavigation = () => {
 		const initialIndex = this.state.filteredItems.findIndex(({ _id }) => this.props.activeItemId === _id);
 		return (
 			<ListNavigation
+				panelType={this.props.type}
 				initialIndex={initialIndex}
 				lastIndex={this.state.filteredItems.length - 1}
 				onChange={this.handleNavigationChange}
 			/>
 		);
-	});
+	}
 
 	public renderEmptyState = renderWhenTrue(() => (
 		<EmptyStateInfo>No entries have been created yet</EmptyStateInfo>
@@ -209,33 +206,16 @@ export class ReportedItems extends React.PureComponent<IProps, IState> {
 
 		const filteredItems = changes.filteredItems || this.state.filteredItems;
 		if (detailsWasClosed && this.listViewRef.current && this.props.activeItemId && filteredItems.length) {
-			this.scrollToFocusedItem(filteredItems);
+			this.listViewRef.current.scrollTop = this.state.prevScroll;
+		}
+
+		if (this.listViewRef.current) {
+			this.setState({prevScroll: this.listViewRef.current.scrollTop});
 		}
 
 		if (!isEmpty(changes)) {
 			this.setState(changes);
 		}
-	}
-
-	public scrollToFocusedItem = (items) => {
-		if (!this.listViewRef.current) {
-			return;
-		}
-
-		this.listViewRef.current.scrollTop = 0;
-		setTimeout(() => {
-			const activeItemIndex = items.findIndex(({ _id }) => _id === this.props.activeItemId);
-			const element = this.listViewRef.current.children[0].children[activeItemIndex] as HTMLElement;
-			if (element) {
-				const position = activeItemIndex * element.offsetHeight;
-				const maxHeight = this.listViewRef.current.offsetHeight;
-				const isNotVisible = position > maxHeight;
-
-				if (isNotVisible) {
-					this.listViewRef.current.scrollTop = position;
-				}
-			}
-		});
 	}
 
 	public hasPermission = (permission) => {
@@ -272,38 +252,6 @@ export class ReportedItems extends React.PureComponent<IProps, IState> {
 
 	public handleOpenSearchMode = () => this.props.onToggleFilters(true);
 
-	public handlePrevItem = () => {
-		const index = this.activeItemIndex;
-
-		const prevIndex = index === 0 ? this.state.filteredItems.length - 1 : index - 1;
-		this.props.onShowDetails(this.state.filteredItems[prevIndex]);
-	}
-
-	public handleNextItem = () => {
-		const index = this.activeItemIndex;
-		const lastIndex = this.state.filteredItems.length - 1;
-		const nextIndex = index === lastIndex ? 0 : index + 1;
-
-		this.props.onShowDetails(this.state.filteredItems[nextIndex]);
-	}
-
-	public getMenuButton = () => (
-		<ButtonMenu
-			renderButton={MenuButton}
-			renderContent={this.renderActionsMenu}
-			PaperProps={{ style: { overflow: 'initial', boxShadow: 'none' } }}
-			PopoverProps={{ anchorOrigin: { vertical: 'center', horizontal: 'left' } }}
-			ButtonProps={{ disabled: false }}
-		/>
-	)
-
-	public getSearchButton = () => {
-		if (this.props.searchEnabled) {
-			return <IconButton onClick={this.handleCloseSearchMode}><CancelIcon /></IconButton>;
-		}
-		return <IconButton onClick={this.handleOpenSearchMode}><SearchIcon /></IconButton>;
-	}
-
 	public renderTitleIcon = () => {
 		const { showDetails, Icon } = this.props;
 		if (showDetails) {
@@ -329,7 +277,7 @@ export class ReportedItems extends React.PureComponent<IProps, IState> {
 				return (
 					<StyledListItem key={index} button onClick={onClick}>
 						<IconWrapper>
-							{isSorting ?  this.renderSortIcon(Icon) : <Icon fontSize="small" />}
+							{isSorting ? this.renderSortIcon(Icon) : <Icon fontSize="small" />}
 						</IconWrapper>
 						<StyledItemText>
 							{label}
@@ -342,19 +290,27 @@ export class ReportedItems extends React.PureComponent<IProps, IState> {
 	)
 
 	public handleNavigationChange = (currentIndex) => {
-		this.props.onShowDetails(this.state.filteredItems[currentIndex]);
+		const itemToShow = this.state.filteredItems[currentIndex] || this.state.filteredItems[0];
+		this.props.onShowDetails(itemToShow);
 	}
 
 	public renderActions = () => {
-		if (this.props.showDetails) {
-			return this.renderHeaderNavigation(this.props.activeItemId && this.state.filteredItems.length >= 2);
+		if (this.props.showDetails && this.props.activeItemId) {
+			const canBeNavigated = this.state.filteredItems.length > 1 ||
+					(this.state.filteredItems.length === 1 && this.state.filteredItems[0]._id !== this.props.activeItemId);
+			return canBeNavigated ?
+					this.renderHeaderNavigation() : <PanelBarActions type={this.props.type} hideSearch hideMenu />;
 		}
 
 		return (
-			<>
-				{this.getSearchButton()}
-				{this.getMenuButton()}
-			</>
+			<PanelBarActions
+				type={this.props.type}
+				menuLabel="Show filters menu"
+				menuActions={this.renderActionsMenu}
+				isSearchEnabled={this.props.searchEnabled}
+				onSearchOpen={this.handleOpenSearchMode}
+				onSearchClose={this.handleCloseSearchMode}
+			/>
 		);
 	}
 

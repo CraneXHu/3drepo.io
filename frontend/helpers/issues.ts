@@ -74,8 +74,8 @@ export const getStatusIcon = (priority, status) => {
 };
 
 export const getIssuePinColor = (issue: any) => {
-	const {priority} = issue;
-	const colorToUse = ISSUE_COLORS[priority] || ISSUE_COLORS[PRIORITIES.NONE];
+	const {priority, status} = issue;
+	const colorToUse = ISSUE_COLORS[status] || ISSUE_COLORS[priority] || ISSUE_COLORS[PRIORITIES.NONE];
 	return colorToUse.pinColor;
 };
 
@@ -205,7 +205,7 @@ export const getHeaderMenuItems = (
 
 	const extraItems = [];
 
-	if (showPins) {
+	if (!!toggleShowPins) {
 		extraItems.push({
 			...ISSUES_ACTIONS_MENU.SHOW_PINS,
 			enabled: showPins,

@@ -34,11 +34,6 @@ export const getRisk = (teamspace, modelId, riskId) => {
  * @param risk
  */
 export const saveRisk = (teamspace, modelId, risk) => {
-	if (risk.pickedPos !== null) {
-		risk.position = risk.pickedPos;
-		risk.norm = risk.pickedNorm;
-	}
-
 	if (risk.rev_id) {
 		return api.post(`${teamspace}/${modelId}/revision/${risk.rev_id}/risks`, risk);
 	}
@@ -101,4 +96,51 @@ export const addRiskComment = (teamspace, modelId, id, comment) => {
  */
 export const deleteRiskComment = (teamspace, modelId, id, guid) => {
 	return api.delete(`${teamspace}/${modelId}/risks/${id}/comments`, {guid});
+};
+
+/**
+ * Remove resource from issue
+ * @param teamspace
+ * @param modelId
+ * @param riskId
+ * @param resourceId
+ */
+export const removeResourceFromRisk = (teamspace, modelId, riskId, resourceId ) => {
+	return api.delete(`${teamspace}/${modelId}/risks/${riskId}/resources`, {_id: resourceId});
+};
+
+/**
+ * Attach resources to issue
+ * @param teamspace
+ * @param modelId
+ * @param riskId
+ * @param names
+ * @param files
+ */
+// tslint:disable-next-line:max-line-length
+export const attachFileResourcesToRisk = (teamspace, modelId, riskId, names: any[], files: any[], percentageCallback ) => {
+	const headers = { headers: { 'Content-Type': 'multipart/form-data' }};
+	const formData = new FormData();
+	files.forEach((f) => formData.append('file', f));
+	names.forEach((n) => formData.append('names', n));
+	const progressHook = {
+		onUploadProgress: (progressEvent) => {
+			const percentCompleted = progressEvent.loaded / progressEvent.total;
+			percentageCallback(percentCompleted);
+		}
+	};
+
+	return api.post(`${teamspace}/${modelId}/risks/${riskId}/resources`, formData, { ...headers, ...progressHook });
+};
+
+/**
+ * Attach resources to issue
+ * @param teamspace
+ * @param modelId
+ * @param riskId
+ * @param names
+ * @param urls
+ */
+export const attachLinkResourcesToRisk = (teamspace, modelId, riskId, names: any[], urls: any[] ) => {
+	return api.post(`${teamspace}/${modelId}/risks/${riskId}/resources`, {names, urls});
 };

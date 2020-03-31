@@ -27,6 +27,7 @@ import { BimActions } from '../bim';
 import { CompareActions } from '../compare';
 import { selectCurrentUser, CurrentUserActions } from '../currentUser';
 import { DialogActions } from '../dialog';
+import { GisActions } from '../gis';
 import { GroupsActions } from '../groups';
 import { selectIssuesMap, IssuesActions } from '../issues';
 import { JobsActions } from '../jobs';
@@ -34,6 +35,7 @@ import { MeasureActions } from '../measure';
 import { selectCurrentRevisionId, selectSettings, ModelActions, ModelTypes } from '../model';
 import { selectRisksMap, RisksActions } from '../risks';
 import { selectUrlParams } from '../router/router.selectors';
+import { SequencesActions } from '../sequences';
 import { StarredActions } from '../starred';
 import { dispatch } from '../store';
 import { TreeActions } from '../tree';
@@ -82,12 +84,14 @@ function* fetchData({ teamspace, model }) {
 function* resetPanelsStates() {
 	try {
 		yield all([
-			put(IssuesActions.resetComponentState()),
-			put(RisksActions.resetComponentState()),
+			put(IssuesActions.reset()),
+			put(RisksActions.reset()),
 			put(GroupsActions.resetComponentState()),
 			put(CompareActions.resetComponentState()),
 			put(BimActions.resetBimState()),
-			put(ViewerGuiActions.resetVisiblePanels())
+			put(ViewerGuiActions.resetPanels()),
+			put(SequencesActions.reset()),
+			put(GisActions.resetLayers())
 		]);
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('reset', 'panels data', error));
@@ -104,6 +108,20 @@ function* setMeasureVisibility({ visible }) {
 		yield put(MeasureActions.setMeasureActive(visible));
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('set', 'measure visibility', error));
+	}
+}
+
+function* setCoordView({ visible }) {
+	try {
+		if (visible) {
+			Viewer.showCoordView();
+		} else {
+			Viewer.hideCoordView();
+		}
+
+		yield put(ViewerGuiActions.setCoordViewSuccess(visible));
+	} catch (error) {
+		yield put(DialogActions.showErrorDialog('set', 'coordinates visibility', error));
 	}
 }
 
@@ -199,11 +217,11 @@ function* updateClipState({clipNumber}) {
 
 		if (currentClipNumber !== clipNumber) {
 			yield put(ViewerGuiActions.setClipNumber(clipNumber));
-		}
 
-		if (clipNumber === 0 && isClipEdit) {
-			yield put(ViewerGuiActions.setClipEdit(false));
-			yield put(ViewerGuiActions.setClippingMode(null));
+			if (clipNumber === 0 && isClipEdit) {
+				yield put(ViewerGuiActions.setClipEdit(false));
+				yield put(ViewerGuiActions.setClippingMode(null));
+			}
 		}
 	} catch (error) {
 		yield put(DialogActions.showErrorDialog('update', 'clip state', error));
@@ -328,30 +346,13 @@ function* setCamera({ params }) {
 	}
 }
 
-function* changePinColor({ params }) {
-	try {
-		const { id, colours } = params;
-		Viewer.changePinColor({ id, colours });
-	} catch (error) {
-		yield put(DialogActions.showErrorDialog('change', 'pin colour', error));
-	}
-}
-
-function* removeUnsavedPin() {
-	try {
-		Viewer.removePin({ id: NEW_PIN_ID });
-		yield put(ViewerGuiActions.setPinData(null));
-	} catch (error) {
-		yield put(DialogActions.showErrorDialog('remove', 'unsaved pin', error));
-	}
-}
-
 function* loadModel() {
 	try {
 		const { teamspace, model } = yield select(selectUrlParams);
 		const revision = yield select(selectCurrentRevisionId);
 		const modelSettings = yield select(selectSettings);
 
+		yield Viewer.isViewerReady();
 		yield Viewer.loadViewerModel(teamspace, model, 'master', revision || 'head');
 		yield Viewer.updateViewerSettings(modelSettings);
 	} catch (error) {
@@ -379,6 +380,7 @@ export default function* ViewerGuiSaga() {
 	yield takeLatest(ViewerGuiTypes.FETCH_DATA, fetchData);
 	yield takeLatest(ViewerGuiTypes.RESET_PANELS_STATES, resetPanelsStates);
 	yield takeLatest(ViewerGuiTypes.SET_MEASURE_VISIBILITY, setMeasureVisibility);
+	yield takeLatest(ViewerGuiTypes.SET_COORD_VIEW, setCoordView);
 	yield takeLatest(ViewerGuiTypes.START_LISTEN_ON_MODEL_LOADED, startListenOnModelLoaded);
 	yield takeLatest(ViewerGuiTypes.STOP_LISTEN_ON_MODEL_LOADED, stopListenOnModelLoaded);
 	yield takeLatest(ViewerGuiTypes.START_LISTEN_ON_CLICK_PIN, startListenOnClickPin);
@@ -398,8 +400,6 @@ export default function* ViewerGuiSaga() {
 	yield takeLatest(ViewerGuiTypes.STOP_LISTEN_ON_NUM_CLIP, stopListenOnNumClip);
 	yield takeLatest(ViewerGuiTypes.CLEAR_HIGHLIGHTS, clearHighlights);
 	yield takeLatest(ViewerGuiTypes.SET_CAMERA, setCamera);
-	yield takeLatest(ViewerGuiTypes.CHANGE_PIN_COLOR, changePinColor);
-	yield takeLatest(ViewerGuiTypes.REMOVE_UNSAVED_PIN, removeUnsavedPin);
 	yield takeLatest(ViewerGuiTypes.LOAD_MODEL, loadModel);
 	yield takeLatest(ViewerGuiTypes.SET_IS_PIN_DROP_MODE, setIsPinDropMode);
 }

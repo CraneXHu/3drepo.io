@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -23,6 +23,7 @@ import FocusIcon from '@material-ui/icons/CenterFocusStrong';
 import ClipIcon from '@material-ui/icons/Crop';
 import HomeIcon from '@material-ui/icons/Home';
 import MetadataIcon from '@material-ui/icons/Info';
+import MyLocationIcon from '@material-ui/icons/MyLocation';
 import TurntableIcon from '@material-ui/icons/Redo';
 import MeasureIcon from '@material-ui/icons/Straighten';
 import ShowAllIcon from '@material-ui/icons/Visibility';
@@ -67,6 +68,7 @@ interface IProps {
 	clippingMode: string;
 	isClipEdit: boolean;
 	clipNumber: number;
+	coordViewActive: boolean;
 	isMetadataActive: boolean;
 	isMeasureActive: boolean;
 	isMeasureDisabled: boolean;
@@ -86,6 +88,7 @@ interface IProps {
 	setClipEdit: (isClipEdit) => void;
 	setMetadataActive: (isActive) => void;
 	setMeasureVisibility: (visible) => void;
+	setCoordView: (visible) => void;
 	stopListenOnNumClip: () => void;
 	setPanelVisibility: (panelName, visibility) => void;
 }
@@ -185,7 +188,7 @@ export class Toolbar extends React.PureComponent<IProps, IState> {
 				label: VIEWER_TOOLBAR_ITEMS.CLIP,
 				Icon: ClipIcon,
 				action: () => this.handleShowSubmenu(VIEWER_TOOLBAR_ITEMS.CLIP),
-				show: !this.props.clippingMode,
+				show: this.props.clipNumber === 0,
 				subMenu: [
 					{
 						label: 'Start box clip',
@@ -203,7 +206,7 @@ export class Toolbar extends React.PureComponent<IProps, IState> {
 				label: VIEWER_TOOLBAR_ITEMS.CLIP,
 				Icon: () =>	<ClipIconWithNumber clipNumber={this.props.clipNumber} />,
 				action: this.handleClipEdit,
-				show: this.props.clippingMode && this.props.clipNumber,
+				show: this.props.clipNumber,
 				active: this.props.isClipEdit
 			},
 			{
@@ -211,6 +214,12 @@ export class Toolbar extends React.PureComponent<IProps, IState> {
 				Icon: MeasureIcon,
 				action: this.toggleMeasure,
 				active: this.props.isMeasureActive
+			},
+			{
+				label: VIEWER_TOOLBAR_ITEMS.COORDVIEW,
+				Icon: MyLocationIcon,
+				action: this.toggleCoordView,
+				active: this.props.coordViewActive
 			},
 			{
 				label: VIEWER_TOOLBAR_ITEMS.BIM,
@@ -238,6 +247,9 @@ export class Toolbar extends React.PureComponent<IProps, IState> {
 
 	public componentWillUnmount() {
 		this.props.setMeasureVisibility(false);
+		if (this.props.isMetadataActive) {
+			this.toggleMetadataPanel();
+		}
 		this.props.stopListenOnNumClip();
 	}
 
@@ -313,24 +325,26 @@ export class Toolbar extends React.PureComponent<IProps, IState> {
 			setMetadataActive,
 			setMeasureVisibility,
 			setPanelVisibility,
-			isMetadataVisible
 		} = this.props;
 		setMetadataActive(!isMetadataActive);
-		setPanelVisibility(VIEWER_PANELS.BIM, !isMetadataVisible);
+		setPanelVisibility(VIEWER_PANELS.BIM, !isMetadataActive);
 
-		if (isMetadataActive) {
-			setPanelVisibility(VIEWER_PANELS.BIM, false);
-		} else {
+		if (!isMetadataActive) {
 			setMeasureVisibility(false);
 		}
 	}
 
+	private toggleCoordView = () => {
+		const { coordViewActive, setCoordView} = this.props;
+		setCoordView(!coordViewActive);
+	}
+
 	private toggleMeasure = () => {
-		const { isMeasureActive, setMeasureVisibility, setPanelVisibility } = this.props;
+		const { isMeasureActive, setMeasureVisibility, setPanelVisibility, isMetadataActive } = this.props;
 		setMeasureVisibility(!isMeasureActive);
 
-		if (!isMeasureActive) {
-			setPanelVisibility(VIEWER_PANELS.BIM, false);
+		if (!isMeasureActive && isMetadataActive) {
+			this.toggleMetadataPanel();
 		}
 	}
 }

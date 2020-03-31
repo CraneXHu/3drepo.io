@@ -105,6 +105,8 @@ module.exports.createApp = function () {
 	app.use("/:account", require("../routes/permissionTemplate"));
 	app.use("/:account", require("../routes/accountPermission"));
 
+	app.use("/:account", require("../routes/invitations"));
+
 	// projects handlers
 	app.use("/:account", require("../routes/project"));
 
@@ -129,6 +131,9 @@ module.exports.createApp = function () {
 
 	// risks handler
 	app.use("/:account/:model", require("../routes/risk"));
+
+	// sequences handler
+	app.use("/:account/:model", require("../routes/sequence"));
 
 	// history handler
 	app.use("/:account/:model", require("../routes/history"));
