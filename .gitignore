@@ -1,5 +1,5 @@
 node_modules
-
+.env*
 !frontend/_built/empty
 frontend/_built/*
 *.*~
@@ -12,14 +12,15 @@ frontend/custom/*
 frontend/custom/test
 frontend/docs
 frontend/tests/e2e/built
-
+acme.json
 frontend/yarn.lock
 backend/yarn.lock
-
+traefik
 yarn-error.log
 bower_components
 
 certs
+docker
 
 public/images/logos
 
