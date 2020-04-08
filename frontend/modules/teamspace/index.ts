@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -15,14 +15,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createSelector } from 'reselect';
+export {
+	TeamspaceTypes,
+	TeamspaceActions
+} from './teamspace.redux';
 
-export const selectMeasureDomain = (state) => ({...state.measure});
-
-export const selectIsMeasureActive = createSelector(
-	selectMeasureDomain, (state) => state.isActive
-);
-
-export const selectIsMeasureDisabled = createSelector(
-	selectMeasureDomain, (state) => state.isDisabled
-);
+export * from './teamspace.selectors';

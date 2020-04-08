@@ -18,13 +18,14 @@ import { reducer as gisReducer } from './gis/gis.redux';
 import { reducer as groupsReducer } from './groups/groups.redux';
 import { reducer as issuesReducer } from './issues/issues.redux';
 import { reducer as jobsReducer } from './jobs/jobs.redux';
-import { reducer as measureReducer } from './measure/measure.redux';
+import { reducer as measurementsReducer } from './measurements/measurements.redux';
 import { reducer as modelReducer } from './model/model.redux';
 import { reducer as notificationsReducer } from './notifications/notifications.redux';
 import { reducer as risksReducer } from './risks/risks.redux';
 import { reducer as sequencesReducer } from './sequences/sequences.redux';
 import { reducer as snackbarReducer } from './snackbar/snackbar.redux';
 import { reducer as starredReducer } from './starred/starred.redux';
+import { reducer as teamspaceReducer } from './teamspace/teamspace.redux';
 import { reducer as teamspacesReducer } from './teamspaces/teamspaces.redux';
 import { reducer as treeReducer } from './tree/tree.redux';
 import { reducer as userManagementReducer } from './userManagement/userManagement.redux';
@@ -32,7 +33,6 @@ import { reducer as usersReducer } from './users/users.redux';
 import { reducer as viewerReducer } from './viewer/viewer.redux';
 import { reducer as viewerGuiReducer } from './viewerGui/viewerGui.redux';
 import { reducer as viewpointsReducer } from './viewpoints/viewpoints.redux';
-
 // <-- IMPORT MODULE REDUCER -->
 
 export default function createReducer(history) {
@@ -64,11 +64,12 @@ export default function createReducer(history) {
 		tree: treeReducer,
 		bim: bimReducer,
 		starred: starredReducer,
-		measure: measureReducer,
+		measurements: measurementsReducer,
 		issues: issuesReducer,
 		compare: compareReducer,
 		chat: chatReducer,
 		viewerGui: viewerGuiReducer,
+		teamspace: teamspaceReducer,
 		sequences: sequencesReducer,
 		board: boardReducer // <-- INJECT MODULE REDUCER -->
 	});

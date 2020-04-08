@@ -10,13 +10,14 @@ import dialogSaga from './dialog/dialog.sagas';
 import groupsSaga from './groups/groups.sagas';
 import issuesSaga from './issues/issues.sagas';
 import jobsSaga from './jobs/jobs.sagas';
-import measureSaga from './measure/measure.sagas';
+import measurementsSaga from './measurements/measurements.sagas';
 import modelSaga from './model/model.sagas';
 import notificationsSaga from './notifications/notifications.sagas';
 import risksSaga from './risks/risks.sagas';
 import sequencesSaga from './sequences/sequences.sagas';
 import starredSaga from './starred/starred.sagas';
 import startupSaga from './startup/startup.sagas';
+import teamspaceSaga from './teamspace/teamspace.sagas';
 import teamspacesSaga from './teamspaces/teamspaces.sagas';
 import treeSaga from './tree/tree.sagas';
 import userManagementSaga from './userManagement/userManagement.sagas';
@@ -45,12 +46,13 @@ export default function* rootSaga() {
 		fork(treeSaga),
 		fork(bimSaga),
 		fork(starredSaga),
-		fork(measureSaga),
+		fork(measurementsSaga),
 		fork(issuesSaga),
 		fork(compareSaga),
 		fork(chatSaga),
 		fork(viewerGuiSaga),
 		fork(dialogSaga),
+		fork(teamspaceSaga),
 		fork(boardSaga),
 		fork(sequencesSaga)
 		// <-- INJECT MODULE SAGA -->

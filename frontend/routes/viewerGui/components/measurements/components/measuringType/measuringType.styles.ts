@@ -15,22 +15,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import IconButton from '@material-ui/core/IconButton';
+export const Wrapper = styled.div`
+	width: 24px;
+	cursor: pointer;
+	margin: 0 3px;
 
-const hiddenStyles = css`
-	pointer-events: none;
-	visibility: hidden;
-`;
-
-const disableGuttersStyles = css`
-	&& {
-		padding: 6px;
+	&& + && {
+		margin: 0 10px;
 	}
 `;
 
-export const StyledIconButton = styled(IconButton)`
-	${({ hidden }) => hidden && hiddenStyles};
-	${({ disableGutters }) => disableGutters && disableGuttersStyles};
+export const Icon = styled.img`
+	max-height: 24px;
+	max-width: 24px;
 `;

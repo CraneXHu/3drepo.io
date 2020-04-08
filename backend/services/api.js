@@ -70,7 +70,7 @@ module.exports.createApp = function () {
 	app.set("view_engine", "pug");
 
 	app.use(bodyParser.json({ limit: "50mb" }));
-	app.use(compress());
+	app.use(compress({ level: 9 }));
 
 	app.use(function (req, res, next) {
 		// intercept OPTIONS method
@@ -112,6 +112,9 @@ module.exports.createApp = function () {
 
 	// models handlers
 	app.use("/:account", require("../routes/model"));
+
+	// risk mitigation handlers
+	app.use("/:account", require("../routes/mitigation"));
 
 	// metadata handler
 	app.use("/:account/:model", require("../routes/meta"));

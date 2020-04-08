@@ -15,9 +15,40 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-export {
-	MeasureTypes,
-	MeasureActions
-} from './measure.redux';
+import styled from 'styled-components';
 
-export * from './measure.selectors';
+import ChipInput from 'material-ui-chip-input';
+
+export const StyledChipInput = styled(ChipInput)`
+	&& {
+		margin-top: 10px;
+
+		> div {
+			min-height: 32px;
+
+			&::before  {
+				border-bottom-color: rgba(0, 0, 0, .12) !important;
+			}
+		}
+
+		div[role="button"] {
+			height: 24px;
+
+			> span {
+				padding-left: 8px;
+				padding-right: 8px;
+			}
+
+			> svg {
+				width: 16px;
+				height: 16px;
+				margin-left: -4px;
+				margin-right: 4px;
+			}
+		}
+
+		div > input {
+			transform: translateY(-3px);
+		}
+	}
+`;
