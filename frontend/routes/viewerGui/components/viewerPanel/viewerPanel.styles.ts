@@ -65,7 +65,7 @@ export const TitleContainer = styled.div`
 	height: inherit;
 
 	button {
-		color: ${COLOR.WHITE};
+		color: ${COLOR.PRIMARY_TEXT};
 
 		&:disabled {
 			color: ${COLOR.GRAY};
@@ -84,7 +84,7 @@ export const Actions = styled.div`
 `;
 
 export const Action = styled.span`
-	color: ${COLOR.WHITE};
+	color: ${COLOR.PRIMARY_TEXT};
 `;
 
 export const TitleIcon = styled.div`

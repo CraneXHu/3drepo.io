@@ -26,6 +26,7 @@ import { IconButton, MenuItem, Tab, Tabs } from '@material-ui/core';
 import Add from '@material-ui/icons/Add';
 import Check from '@material-ui/icons/Check';
 
+import { COLOR } from '../../styles/colors';
 import { renderWhenTrue } from '../../helpers/rendering';
 import { sortModels } from '../../modules/teamspaces/teamspaces.helpers';
 import { ButtonMenu } from '../components/buttonMenu/buttonMenu.component';
@@ -572,7 +573,7 @@ export class Teamspaces extends React.PureComponent<IProps, IState> {
 				<Head>
 					<Tabs
 						indicatorColor="primary"
-						textColor="primary"
+						textColor={COLOR.BLACK_60}
 						value={Number(showStarredOnly)}
 						onChange={this.handleTabChange}
 					>

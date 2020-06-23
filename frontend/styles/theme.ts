@@ -34,13 +34,13 @@ export const MuiTheme = createMuiTheme({
 			main: theme.colors.PRIMARY_MAIN,
 			light: theme.colors.PRIMARY_LIGHT,
 			dark: theme.colors.PRIMARY_DARK,
-			contrastText: theme.colors.WHITE
+			contrastText: theme.colors.PRIMARY_TEXT
 		},
 		secondary: {
 			main: theme.colors.SECONDARY_MAIN,
 			light: theme.colors.SECONDARY_LIGHT,
 			dark: theme.colors.SECONDARY_DARK,
-			contrastText: theme.colors.WHITE
+			contrastText: theme.colors.SECONDARY_TEXT
 		}
 	},
 	overrides: {

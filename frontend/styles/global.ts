@@ -53,12 +53,11 @@ export const GlobalStyle = createGlobalStyle`
 		display: flex;
 		min-height: 100%;
 		max-height: 100%;
-		background: url(${appBackgroundImage}) no-repeat;
 		background-size: cover;
 	}
 
 	html, body {
-		background: ${COLOR.CLOUD};
+		background: ${COLOR.BLACK_6};
 	}
 
 	#viewer #unityViewer {

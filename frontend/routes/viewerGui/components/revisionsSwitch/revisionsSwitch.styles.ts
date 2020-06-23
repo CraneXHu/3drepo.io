@@ -23,7 +23,7 @@ import { COLOR, FONT_WEIGHT } from '../../../../styles';
 
 export const Container = styled.div`
 	position: absolute;
-	color: ${COLOR.WHITE};
+	color: ${COLOR.PRIMARY_TEXT};
 	left: 50%;
 	transform: translateX(-50%);
 	text-align: center;

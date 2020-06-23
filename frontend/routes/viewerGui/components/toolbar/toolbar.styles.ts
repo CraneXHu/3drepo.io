@@ -64,7 +64,7 @@ export const SubmenuDot = styled.i`
 	&::before {
 		content: '\\25CF';
 		font-size: 8px;
-		color: ${COLOR.WHITE};
+		color: ${COLOR.PRIMARY_TEXT};
 		width: 100%;
 		position: absolute;
 		font-style: normal;
@@ -87,7 +87,7 @@ export const ToolbarButton = styled(TooltipButton)`
 		}
 
 		background-color: ${(props: any) => props.coloured ? COLOR.SUNGLOW : COLOR.REGENT_GRAY};
-		color: ${(props: any) => props.active && props.variant === 'primary' ? COLOR.SUNGLOW : COLOR.WHITE};
+		color: ${(props: any) => props.active && props.variant === 'primary' ? COLOR.SECONDARY_TEXT : COLOR.PRIMARY_TEXT};
 		box-shadow: ${(props: any) => props.variant === 'secondary' ? `0 3px 3px ${COLOR.BLACK_16}` : 'none'};
 		margin-bottom: ${(props: any) => props.variant === 'secondary' ? `10px` : '0'};
 

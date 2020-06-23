@@ -4,17 +4,26 @@ import { hexToGLColor, hexToRgba } from '../helpers/colors';
 
 export const BLACK = '#000000';
 export const WHITE = '#ffffff';
-export const PRIMARY_MAIN = '#0c2f54';
-export const SECONDARY_MAIN = '#06563c';
+export const PRIMARY_MAIN = '#1c313a';
+export const PRIMARY_LIGHT = '#718792';
+export const PRIMARY_DARK = '#4b636e';
+export const SECONDARY_MAIN = '#FF028B';
+export const SECONDARY_LIGHT= '#7d7fff';
+export const SECONDARY_DARK = '#0029ca';
+export const PRIMARY_TEXT = WHITE;
+export const SECONDARY_TEXT = WHITE;
+
 
 export const COLOR = {
+	PRIMARY_TEXT,
+	SECONDARY_TEXT,
 	PRIMARY_MAIN,
-	PRIMARY_LIGHT: '#3c5876',
-	PRIMARY_DARK: '#08203a',
-	SECONDARY_MAIN: '#06563c',
+	PRIMARY_LIGHT,
+	PRIMARY_DARK,
+	SECONDARY_MAIN,
 	SECONDARY_MAIN_54: hexToRgba(SECONDARY_MAIN, .54),
-	SECONDARY_LIGHT: '#377763',
-	SECONDARY_DARK: '#043827',
+	SECONDARY_LIGHT,
+	SECONDARY_DARK,
 	PRIMARY_MAIN_80: hexToRgba(PRIMARY_MAIN, .8),
 	PRIMARY_MAIN_6: hexToRgba(PRIMARY_MAIN, .06),
 
@@ -79,7 +88,7 @@ export const COLOR = {
 	POMEGRANATE: '#F44336',
 	NEGATIVE: 'rgba(234, 57, 57, 1)',
 	NEGATIVE_87: 'rgba(234, 57, 57, 0.87)',
-	REGENT_GRAY: '#8397AC',
+	REGENT_GRAY: PRIMARY_LIGHT,
 	SILVER_CHALICE: '#A8A8A8',
 	LIGHT_BLUE: '#6788ab',
 	LIGHT_GREY_BLUE: '#dee2e6',

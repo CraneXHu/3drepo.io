@@ -22,7 +22,7 @@ import { StarIcon as StarIconComponent } from '../../../components/starIcon/star
 
 export const Container = styled.div`
 	box-shadow: 0 2px 4px 0 ${COLOR.BLACK_20};
-	background-color: ${(props) => props.federate ? COLOR.ALICE_BLUE : COLOR.WHITE};
+	background-color: ${(props) => props.federate ? COLOR.PRIMARY_MAIN_6 : COLOR.WHITE};
 	color: ${COLOR.TUNDORA};
 	display: flex;
 	flex-direction: column;

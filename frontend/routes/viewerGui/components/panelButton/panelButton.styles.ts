@@ -24,7 +24,7 @@ export const setStyle = (statement, trueValue, falseValue) => statement ? trueVa
 export const Button = styled(TooltipButton)`
 	&& {
 		background-color: ${(props: any) => props.active ? COLOR.PRIMARY_MAIN : COLOR.REGENT_GRAY};
-		color: ${COLOR.WHITE};
+		color: ${COLOR.PRIMARY_TEXT};
 		box-shadow: 0 3px 3px ${COLOR.BLACK_16};
 
 		&:hover {
