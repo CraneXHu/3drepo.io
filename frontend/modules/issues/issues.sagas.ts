@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2017 3D Repo Ltd
+ *  Copyright (C) 2020 3D Repo Ltd
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Affero General Public License as
@@ -25,6 +25,7 @@ import { CHAT_CHANNELS } from '../../constants/chat';
 import { DEFAULT_PROPERTIES, PRIORITIES, STATUSES } from '../../constants/issues';
 import { EXTENSION_RE } from '../../constants/resources';
 import { ROUTES } from '../../constants/routes';
+import { UnityUtil } from '../../globals/unity-util';
 import {
 	createAttachResourceComments,
 	createRemoveResourceComment
@@ -44,7 +45,7 @@ import { selectCurrentModel, selectCurrentModelTeamspace } from '../model';
 import { selectQueryParams, selectUrlParams } from '../router/router.selectors';
 import { SnackbarActions } from '../snackbar';
 import { dispatch, getState } from '../store';
-import { selectTopicTypes, TeamspaceActions } from '../teamspace';
+import { selectTopicTypes } from '../teamspace';
 import { selectIfcSpacesHidden, TreeActions } from '../tree';
 import { IssuesActions, IssuesTypes } from './issues.redux';
 import {
@@ -107,6 +108,7 @@ const createGroup = (issue, objectInfo, teamspace, model, revision) => {
 };
 
 function* saveIssue({ teamspace, model, issueData, revision, finishSubmitting, ignoreViewer = false }) {
+	yield put(IssuesActions.toggleDetailsPendingState(true));
 	try {
 		const myJob = yield select(selectMyJob);
 		const ifcSpacesHidden = yield select(selectIfcSpacesHidden);
@@ -125,14 +127,18 @@ function* saveIssue({ teamspace, model, issueData, revision, finishSubmitting, i
 		};
 
 		if (objectInfo && (objectInfo.highlightedNodes.length > 0 || objectInfo.hiddenNodes.length > 0)) {
-			const [highlightedGroup, hiddenGroup] = yield createGroup(issueData, objectInfo, teamspace, model, revision);
-
-			if (highlightedGroup) {
-				viewpoint.highlighted_group_id = highlightedGroup.data._id;
+			const {highlightedNodes, hiddenNodes} = objectInfo;
+			if (highlightedNodes.length > 0) {
+				viewpoint.highlighted_group = {
+					objects: highlightedNodes,
+					color: UnityUtil.defaultHighlightColor.map((c) => c * 255)
+				} ;
 			}
 
-			if (hiddenGroup) {
-				viewpoint.hidden_group_id = hiddenGroup.data._id;
+			if (hiddenNodes.length > 0) {
+				viewpoint.hidden_group = {
+					objects: hiddenNodes
+				};
 			}
 		}
 
@@ -165,6 +171,7 @@ function* saveIssue({ teamspace, model, issueData, revision, finishSubmitting, i
 	} catch (error) {
 		yield put(DialogActions.showEndpointErrorDialog('save', 'issue', error));
 	}
+	yield put(IssuesActions.toggleDetailsPendingState(false));
 }
 
 function* updateIssue({ issueData }) {
@@ -209,16 +216,28 @@ function* updateNewIssue({ newIssue }) {
 }
 
 function* postComment({ issueData, finishSubmitting }) {
+	yield put(IssuesActions.togglePostCommentPendingState(true));
 	try {
 		const { _id, model, account } = yield select(selectActiveIssueDetails);
-		const { data: comment } = yield API.addIssueComment(account, model, _id, issueData);
+		const viewpoint = yield Viewer.getCurrentViewpoint({ teamspace: account, model });
 
+		issueData.viewpoint = {
+			...viewpoint,
+			... issueData.viewpoint
+		};
+
+		if (isEmpty(issueData.viewpoint) || isEqual(issueData.viewpoint, { screenshot: '' }) ) {
+			delete issueData.viewpoint;
+		}
+
+		const { data: comment } = yield API.addIssueComment(account, model, _id, issueData);
 		finishSubmitting();
 		yield put(IssuesActions.createCommentSuccess(comment, _id));
 		yield put(SnackbarActions.show('Issue comment added'));
 	} catch (error) {
 		yield put(DialogActions.showEndpointErrorDialog('post', 'issue comment', error));
 	}
+	yield put(IssuesActions.togglePostCommentPendingState(false));
 }
 
 function* removeComment({ issueData }) {

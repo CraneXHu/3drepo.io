@@ -61,6 +61,7 @@ interface IProps {
 	attachLinkResources: (links) => void;
 	showDialog: (config: any) => void;
 	showScreenshotDialog: (config: any) => void;
+	postCommentIsPending?: boolean;
 }
 
 interface IState {
@@ -94,10 +95,6 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 
 	get jobsList() {
 		return [...this.props.jobs, UNASSIGNED_JOB];
-	}
-
-	get isViewerInitialized() {
-		return this.props.viewer.initialized;
 	}
 
 	public renderMessagesList = renderWhenTrue(() => {
@@ -164,6 +161,8 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 				messagesContainerRef={this.messageContainerRef}
 				previewWrapperRef={this.containerRef}
 				horizontal={this.props.horizontal}
+				fetchingDetailsIsPending={this.props.fetchingDetailsIsPending}
+				postCommentIsPending={this.props.postCommentIsPending}
 			/>
 		</ViewerPanelFooter>
 	));
@@ -289,9 +288,8 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 		this.props.setState({ newComment });
 	}
 
-	public handleNewScreenshot = async (screenshot) => {
+	public handleNewScreenshot = (screenshot) => {
 		const { teamspace, model, viewer } = this.props;
-		const viewpoint = this.isViewerInitialized ? await viewer.getCurrentViewpoint({ teamspace, model }) : null;
 
 		if (this.isNewIssue) {
 			this.props.setState({
@@ -301,21 +299,15 @@ export class IssueDetails extends React.PureComponent<IProps, IState> {
 				}
 			});
 		} else {
-			if (viewpoint) {
-				this.setCommentData({ screenshot, viewpoint });
-			} else {
-				this.setCommentData({ screenshot });
-			}
+			this.setCommentData({ screenshot });
 		}
 	}
 
-	public postComment = async (teamspace, model, { comment, screenshot }, finishSubmitting) => {
-		const viewpoint = this.isViewerInitialized ? await this.props.viewer.getCurrentViewpoint({ teamspace, model }) : null;
+	public postComment = (teamspace, model, { comment, screenshot }, finishSubmitting) => {
 		const issueCommentData = {
 			_id: this.issueData._id,
 			comment,
 			viewpoint: {
-				...viewpoint,
 				screenshot
 			}
 		};
