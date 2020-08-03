@@ -164,6 +164,21 @@ export class TreeNode extends React.PureComponent<IProps, any> {
 		/>
 	));
 
+	private renderIsolateAction = renderWhenTrue(() => (
+		<SmallIconButton
+			Icon={IsolateIcon}
+			tooltip="Isolate"
+			onClick={this.isolateSelectedNodes}
+		/>
+	));
+	private renderVisibilityAction = renderWhenTrue(() => (
+		<SmallIconButton
+			Icon={this.getVisibilityIcon(this.props.visibilityMap[this.node._id])}
+			tooltip="Show/Hide"
+			onClick={this.toggleShowNode}
+		/>
+	));
+
 	private onChangeLoadStatus = (e: React.SyntheticEvent) => {
 		e.stopPropagation();
 
@@ -184,16 +199,8 @@ export class TreeNode extends React.PureComponent<IProps, any> {
 			{}
 			{this.renderOpenModelAction(this.isSubmodelRoot)}
 			{this.renderGoTopAction(!this.isSubmodelRoot)}
-			<SmallIconButton
-				Icon={IsolateIcon}
-				tooltip="Isolate"
-				onClick={this.isolateSelectedNodes}
-			/>
-			<SmallIconButton
-				Icon={this.getVisibilityIcon(this.props.visibilityMap[this.node._id])}
-				tooltip="Show/Hide"
-				onClick={this.toggleShowNode}
-			/>
+			{this.renderIsolateAction(!this.isSubmodelRoot)}
+			{this.renderVisibilityAction(!this.isSubmodelRoot)}
 			{this.isSubmodelRoot &&
 				<Switch
 					onClick={(e) => e.stopPropagation()}

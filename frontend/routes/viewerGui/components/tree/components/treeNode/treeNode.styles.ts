@@ -110,14 +110,9 @@ export const Container = styled.li<IContainer>`
 	box-sizing: border-box;
 	cursor: pointer;
 
-	&:hover ${Actions} {
+	${Actions} {
 		display: block;
 	}
-	${({ active }: any) => active ? css`
-		${Actions} {
-			display: block;
-		}
-	` : ''};
 `;
 
 export const Name = styled.div<IName>`
