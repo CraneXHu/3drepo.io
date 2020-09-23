@@ -25,5 +25,3 @@ jobs:
         exec: helm delete $( echo $GITHUB_REF | rev | awk '{split($0,a,"/"); print a[1]}' | rev | sed "s/_/-/" | awk '{print tolower($0)}' )
         # The full helm command to run (including helm)
         kubeconfig: '${{ secrets.KUBECONFIG_JSON }}'
-
-#changes
