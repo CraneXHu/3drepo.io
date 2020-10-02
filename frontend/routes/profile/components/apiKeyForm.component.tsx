@@ -18,14 +18,14 @@
 import { Button } from '@material-ui/core';
 import { Form } from 'formik';
 import React from 'react';
+import { CopyableField } from '../../components/copyableField/copyableField.component';
 
 import {
 	DeleteButton,
 	FieldsRow,
 	FormContainer,
 	Headline,
-	StyledButtonContainer,
-	StyledTextField
+	StyledButtonContainer
 } from '../profile.styles';
 
 interface IProps {
@@ -42,7 +42,7 @@ export class APIKeyForm extends React.PureComponent<IProps> {
 				<FormContainer container direction="column">
 					<Headline color="primary" variant="subheading">Api Key</Headline>
 					<FieldsRow container wrap="nowrap">
-						<StyledTextField
+						<CopyableField
 							value={apiKey}
 							inputProps={{
 								readOnly: true
