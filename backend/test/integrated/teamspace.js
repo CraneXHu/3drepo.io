@@ -887,4 +887,99 @@ describe("Teamspace", function() {
 				.expect(200, done);
 		});
 	});
+
+	describe("Find users without membership", function(done) {
+		const user =  imsharedTeamspace;
+		const goldenUserData = [
+			{
+				"user" : "testuser",
+				"roles" : [
+					{
+						"role" : "team_member",
+						"db" : "testuser"
+					}
+				],
+				"firstName" : "testuser",
+				"lastName" : "testuser",
+				"company": "testuser"
+			}
+		];
+
+		before(function(done) {
+			this.timeout(timeout);
+			agent.post("/login")
+				.send({username: user.user, password: user.password})
+				.expect(200, done);
+
+		});
+
+		it("with e-mail should succeed", function(done) {
+			const searchTerm = "test-testusere2e@3drepo.io";
+			agent.get(`/${user.user}/members/search/${searchTerm}`)
+				.expect(200, function(err, res) {
+					expect(res.body.value).to.deep.equal(goldenUserData);
+					done(err);
+				});
+		});
+
+		it("with e-mail in different casing should succeed", function(done) {
+			const searchTerm = "TEST-testusere2e@3DREPO.IO";
+			agent.get(`/${user.user}/members/search/${searchTerm}`)
+				.expect(200, function(err, res) {
+					expect(res.body.value).to.deep.equal(goldenUserData);
+					done(err);
+				});
+		});
+
+		it("with non-existent e-mail should succeed", function(done) {
+			const searchTerm = "user_does_not_exist@nowhere.is";
+			agent.get(`/${user.user}/members/search/${searchTerm}`)
+				.expect(200, function(err, res) {
+					expect(res.body.value).to.deep.equal([]);
+					done(err);
+				});
+		});
+
+		it("with username should succeed", function(done) {
+			const searchTerm = "testuser";
+			agent.get(`/${user.user}/members/search/${searchTerm}`)
+				.expect(200, function(err, res) {
+					expect(res.body.value).to.deep.equal(goldenUserData);
+					done(err);
+				});
+		});
+
+		it("with partial username should succeed", function(done) {
+			const searchTerm = "testuse";
+			agent.get(`/${user.user}/members/search/${searchTerm}`)
+				.expect(200, function(err, res) {
+					expect(res.body.value).to.deep.equal(goldenUserData);
+					done(err);
+				});
+		});
+
+		it("with username in different casing should succeed", function(done) {
+			const searchTerm = "TESTUSER";
+			agent.get(`/${user.user}/members/search/${searchTerm}`)
+				.expect(200, function(err, res) {
+					expect(res.body.value).to.deep.equal(goldenUserData);
+					done(err);
+				});
+		});
+
+		it("matching multiple usernames should succeed", function(done) {
+			const searchTerm = "TEST";
+			agent.get(`/${user.user}/members/search/${searchTerm}`)
+				.expect(200, function(err, res) {
+					expect(res.body.value.length).to.equal(4);
+					done(err);
+				});
+		});
+
+		after(function(done) {
+			this.timeout(timeout);
+			agent.post("/logout")
+				.expect(200, done);
+		});
+	});
 });
