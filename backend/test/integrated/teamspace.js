@@ -917,7 +917,7 @@ describe("Teamspace", function() {
 			const searchTerm = "test-testusere2e@3drepo.io";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
-					expect(res.body.value).to.deep.equal(goldenUserData);
+					expect(res.body).to.deep.equal(goldenUserData);
 					done(err);
 				});
 		});
@@ -926,7 +926,7 @@ describe("Teamspace", function() {
 			const searchTerm = "TEST-testusere2e@3DREPO.IO";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
-					expect(res.body.value).to.deep.equal(goldenUserData);
+					expect(res.body).to.deep.equal(goldenUserData);
 					done(err);
 				});
 		});
@@ -935,7 +935,7 @@ describe("Teamspace", function() {
 			const searchTerm = "user_does_not_exist@nowhere.is";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
-					expect(res.body.value).to.deep.equal([]);
+					expect(res.body).to.deep.equal([]);
 					done(err);
 				});
 		});
@@ -944,7 +944,7 @@ describe("Teamspace", function() {
 			const searchTerm = "testuser";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
-					expect(res.body.value).to.deep.equal(goldenUserData);
+					expect(res.body).to.deep.equal(goldenUserData);
 					done(err);
 				});
 		});
@@ -953,7 +953,7 @@ describe("Teamspace", function() {
 			const searchTerm = "testuse";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
-					expect(res.body.value).to.deep.equal(goldenUserData);
+					expect(res.body).to.deep.equal(goldenUserData);
 					done(err);
 				});
 		});
@@ -962,7 +962,7 @@ describe("Teamspace", function() {
 			const searchTerm = "TESTUSER";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
-					expect(res.body.value).to.deep.equal(goldenUserData);
+					expect(res.body).to.deep.equal(goldenUserData);
 					done(err);
 				});
 		});
@@ -971,7 +971,7 @@ describe("Teamspace", function() {
 			const searchTerm = "TEST";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
-					expect(res.body.value.length).to.equal(4);
+					expect(res.body.length).to.equal(4);
 					done(err);
 				});
 		});
