@@ -971,6 +971,7 @@ describe("Teamspace", function() {
 			const searchTerm = "TEST";
 			agent.get(`/${user.user}/members/search/${searchTerm}`)
 				.expect(200, function(err, res) {
+					console.log(res.body);
 					expect(res.body.length).to.equal(4);
 					done(err);
 				});
