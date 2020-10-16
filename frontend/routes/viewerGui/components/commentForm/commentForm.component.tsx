@@ -24,7 +24,7 @@ import SaveIcon from '@material-ui/icons/Save';
 import ShortTextIcon from '@material-ui/icons/ShortText';
 import ReactTextareaAutocomplete from '@webscopeio/react-textarea-autocomplete';
 import { Field, Formik } from 'formik';
-import { values as _values } from 'lodash';
+import { lowerCase, pick, values as _values } from 'lodash';
 import React from 'react';
 import * as Yup from 'yup';
 
@@ -42,6 +42,7 @@ import {
 	Actions,
 	ActionsGroup,
 	Container,
+	Counter,
 	FileUploadContainer,
 	FileUploadInvoker,
 	RemoveButtonWrapper,
@@ -121,8 +122,9 @@ export class CommentForm extends React.PureComponent<IProps, IState> {
 		return 'You are not able to comment';
 	}
 
-	private filteredUsersList = (token) => this.props.teamspaceUsers.filter(({ user }) =>
-		user.startsWith(token)).slice(0, 5)
+	private filteredUsersList = (token) => this.props.teamspaceUsers.filter((user) =>
+			_values(pick(user, ['user', 'firstName', 'lastName']))
+				.map(lowerCase).some((value) => value.includes(lowerCase(token)))).slice(0, 5)
 
 	private filteredTicketsList = (token) =>
 			_values(this.props.tickets).filter(({ number: ticketNumber }) =>
@@ -169,6 +171,7 @@ export class CommentForm extends React.PureComponent<IProps, IState> {
 	));
 
 	private renderTextAreaComponent = React.forwardRef((props, ref) => {
+		const counterValue = this.props.commentRef.current?.textareaRef.value.length;
 		return (
 			<>
 				<StyledTextField
@@ -182,6 +185,7 @@ export class CommentForm extends React.PureComponent<IProps, IState> {
 					disabled={!this.props.canComment}
 					inputRef={ref}
 				/>
+				<Counter error={counterValue > 220}>{counterValue}/220</Counter>
 			</>
 		);
 	});

@@ -63,7 +63,7 @@ export const selectActiveRiskComments = createSelector(
 	selectActiveRiskDetails, selectRisksMap, (activeRiskDetails, risks) =>
 		prepareComments(activeRiskDetails.comments || []).map((comment) => ({
 			...comment,
-			commentWithMarkdown: transformCustomsLinksToMarkdown(comment, risks, 'risk')
+			commentWithMarkdown: transformCustomsLinksToMarkdown(activeRiskDetails, comment, risks, 'risk')
 		}))
 );
 
@@ -102,7 +102,7 @@ export const selectFilteredRisks = createSelector(
 
 export const selectAllFilteredRisks = createSelector(
 	selectRisks, selectSelectedFilters, (risks, selectedFilters) =>
-		searchByFilters(risks, selectedFilters, true)
+		searchByFilters(risks, selectedFilters, true, ['name', 'desc', 'number'])
 );
 
 export const selectShowPins = createSelector(
